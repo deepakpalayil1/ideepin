@@ -726,6 +726,19 @@ body::before{
     </div>
   </div>
 
+  <!-- GITHUB MEMORY CONFIG -->
+  <div id="ghConfigWrap" style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="font-family:var(--m);font-size:9px;color:var(--muted);white-space:nowrap">⟳ GitHub Memory Sync</span>
+    <input class="form-input" id="ghUserInput" placeholder="Your GitHub username (e.g. deepakpalayil1)"
+      style="flex:1;min-width:160px;font-size:10px;padding:6px 10px"
+      value="" oninput="">
+    <button class="btn-secondary" style="white-space:nowrap;padding:6px 12px;font-size:10px"
+      onclick="saveGitHubUser(document.getElementById('ghUserInput').value)">Save Username</button>
+    <button class="btn-secondary" style="white-space:nowrap;padding:6px 12px;font-size:10px;border-color:var(--blue);color:var(--blue)"
+      onclick="loadFromGitHub()">↓ Load from GitHub</button>
+    <span style="font-family:var(--m);font-size:9px;color:var(--muted)">After adding entries use <strong>Save to GitHub</strong> → upload file to your repo</span>
+  </div>
+
   <!-- PORTFOLIO SUMMARY -->
   <div class="port-summary">
     <div class="ps-card" style="border-top:2px solid var(--blue)">
@@ -839,8 +852,9 @@ body::before{
     <div class="entry-actions">
       <button class="btn-primary" onclick="addEntry()">Save Entry</button>
       <button class="btn-secondary" onclick="clearForm()">Clear</button>
-      <button class="btn-secondary" onclick="exportPortfolioData()" title="Download your portfolio data as a JSON file — open this file next time to restore all entries">⬇ Export Data</button>
+      <button class="btn-secondary" onclick="exportPortfolioData()" title="Download portfolio JSON — import next session to restore data">⬇ Export Data</button>
       <button class="btn-secondary" onclick="document.getElementById('importFileInput').click()" title="Load a previously exported portfolio JSON file">⬆ Import Data</button>
+      <button class="btn-secondary" onclick="exportForGitHub()" title="Download portfolio_memory.json — upload this to your GitHub repo to sync data" style="border-color:var(--green);color:var(--green)">⟳ Save to GitHub</button>
       <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importPortfolioData(this)">
       <span style="font-family:var(--m);font-size:10px;color:var(--amber)">
         ⚠ Export your data before closing · Data lives in this browser session
@@ -875,51 +889,6 @@ body::before{
     </div>
   </div>
 
-  <!-- GOOGLE DRIVE SYNC PANEL -->
-  <div class="entry-section" style="margin-top:20px">
-    <div class="entry-title">
-      <span>☁ Google Drive Sync</span>
-      <span id="gdriveStatus" style="font-family:var(--m);font-size:10px;color:var(--amber);font-weight:400;margin-left:12px">Not connected · Setup required</span>
-    </div>
-
-    <div style="background:var(--amber-d);border:1px solid var(--amber-b);border-radius:8px;padding:11px 14px;margin-bottom:14px;font-size:11px;color:var(--amber);line-height:1.8">
-      <strong>Why connect?</strong> Without Drive, your data only lives in this browser session. Connecting Drive saves every entry permanently to your Google account — accessible from any device, any browser, any time.
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:12px;align-items:end">
-      <div class="form-group">
-        <label class="form-label">OAuth Client ID (from Google Cloud Console)</label>
-        <input class="form-input" id="gdriveClientId" placeholder="Paste your OAuth Client ID here (ends in .apps.googleusercontent.com)"
-          value="" oninput="gdrive_setClientId(this.value)"
-          style="font-size:10px">
-      </div>
-      <button class="btn-primary" id="gdriveConnectBtn" onclick="gdrive_connect()" style="white-space:nowrap;height:38px">
-        Connect Drive
-      </button>
-    </div>
-
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn-primary" id="gdriveSyncBtn" onclick="gdrive_saveToCloud()" disabled style="background:linear-gradient(135deg,var(--green),var(--teal))">
-        ⬆ Save to Drive
-      </button>
-      <button class="btn-secondary" id="gdriveLoadBtn" onclick="gdrive_loadFromCloud()" disabled>
-        ⬇ Load from Drive
-      </button>
-      <span style="font-family:var(--m);font-size:10px;color:var(--muted);align-self:center">
-        Once connected, saves automatically after every entry
-      </span>
-    </div>
-
-    <div style="margin-top:14px;background:var(--bg3);border-radius:8px;padding:12px 14px;font-family:var(--m);font-size:10px;color:var(--muted);line-height:2">
-      <strong style="color:var(--text)">Quick Setup (5 min):</strong><br>
-      1 · Go to <strong style="color:var(--blue)">console.cloud.google.com</strong> → New Project → name it "iDeepin"<br>
-      2 · APIs & Services → Enable APIs → enable <strong>Google Drive API</strong><br>
-      3 · Credentials → Create → OAuth 2.0 Client ID → Web Application<br>
-      4 · Authorised JavaScript origins → add <code style="color:var(--green)">http://localhost</code> and <code style="color:var(--green)">https://yourdomain.com</code><br>
-      5 · Copy the Client ID → paste above → click Connect Drive<br>
-      6 · Approve Google sign-in popup → done. Your data saves to <strong>portfolio_memory.json</strong> in Google Drive.
-    </div>
-  </div>
 
   <!-- P&L CHART -->
   <div class="chart-row" style="margin-top:20px">
@@ -1026,9 +995,8 @@ body::before{
       <div class="diag-row"><span class="diag-label">Algorithm v3.4</span><span class="diag-val diag-ok">● OPERATIONAL</span></div>
       <div class="diag-row"><span class="diag-label">ST-v1</span><span class="diag-val diag-ok">● OPERATIONAL</span></div>
       <div class="diag-row"><span class="diag-label">Market Data Feed</span><span class="diag-val diag-ok">● CONNECTED</span></div>
-      <div class="diag-row"><span class="diag-label">Google Drive Sync</span><span class="diag-val diag-warn">⚠ NEEDS SETUP</span></div>
-      <div class="diag-row"><span class="diag-label">Google Calendar</span><span class="diag-val diag-warn">⚠ NEEDS AUTH</span></div>
       <div class="diag-row"><span class="diag-label">Scheduler (9:15 CST)</span><span class="diag-val diag-warn">⚠ NEEDS BACKEND</span></div>
+      <div class="diag-row"><span class="diag-label">GitHub Memory Sync</span><span class="diag-val" id="diagGH">Configured if username set</span></div>
       <div class="diag-row"><span class="diag-label">Portfolio Memory</span><span class="diag-val diag-ok">● LOCAL ACTIVE</span></div>
       <div class="diag-row"><span class="diag-label">Last Auto-Run</span><span class="diag-val" id="diagLastRun">—</span></div>
     </div>
@@ -1119,7 +1087,7 @@ body::before{
 <!-- FOOTER -->
 <footer class="app-footer">
   iDeepin · <span style="font-style:italic">Intelligent Deep Investment</span> ·
-  Version 1.6.0 · Updated May 11 2026 · Algorithm v3.4 + ST-v1 ·
+  Version 1.7.0 · Updated May 11 2026 · Algorithm v3.4 + ST-v1 ·
   Not financial advice · For informational purposes only
 </footer>
 
@@ -1581,30 +1549,55 @@ function setFinnhubKey(k) {
   showToast('✓ API key saved');
 }
 
+// Symbol normaliser — maps common tickers to Twelve Data format
+const TD_SYMBOL_MAP = {
+  'NVO':'NVO',       // Novo Nordisk ADR — US listed, works directly
+  'SOXX':'SOXX',     // iShares Semiconductor ETF — US listed
+  'RKLB':'RKLB',     // Rocket Lab — US listed NASDAQ
+  'UBER':'UBER',     // Uber — US listed NYSE
+  'EU':'EU',         // WisdomTree Europe ETF — try as-is
+  'FLNC':'FLNC',     // Fluence Energy
+  'AVAV':'AVAV',     // AeroVironment
+  'COHR':'COHR',     // Coherent Corp
+  'FCX':'FCX',       // Freeport
+  'AEM':'AEM',       // Agnico Eagle
+  'ONON':'ONON',     // On Holding ADR
+  'TSM':'TSM',       // Taiwan Semi ADR
+  'ASML':'ASML',     // ASML ADR
+};
+
 async function fetchPrice(ticker) {
   const key = getFinnhubKey().trim();
   if (!key) return { err: 'NO_KEY' };
-  const cleanTicker = ticker.split(/[\s\u2014\-]/)[0].toUpperCase().trim();
+  // Clean and map ticker
+  let cleanTicker = ticker.split(/[\s\u2014\-]/)[0].toUpperCase().trim();
+  cleanTicker = TD_SYMBOL_MAP[cleanTicker] || cleanTicker;
   try {
-    const url = `https://api.twelvedata.com/price?symbol=${cleanTicker}&apikey=${key}`;
+    // Use /quote for full data (price + change + prev close)
+    const url = `https://api.twelvedata.com/quote?symbol=${encodeURIComponent(cleanTicker)}&apikey=${key}`;
     const res  = await fetch(url);
     if (res.status === 401 || res.status === 403) return { err: 'BAD_KEY' };
     if (res.status === 429) return { err: 'RATE_LIMIT' };
     if (!res.ok) return { err: 'HTTP_' + res.status };
     const d = await res.json();
-    // Twelve Data error formats
-    if (d && d.code && d.code !== 200) return { err: 'API_ERR', msg: d.message||d.code };
-    if (d && d.status === 'error')     return { err: 'API_ERR', msg: d.message };
-    const price = parseFloat(d.price);
-    if (!price || isNaN(price))        return { err: 'NO_DATA', ticker: cleanTicker };
+    if (d && d.status === 'error') return { err: 'API_ERR', msg: d.message };
+    if (d && d.code && d.code === 400) return { err: 'BAD_SYMBOL', ticker: cleanTicker };
+    const price = parseFloat(d.close || d.price || 0);
+    if (!price || isNaN(price)) return { err: 'NO_DATA', ticker: cleanTicker };
+    const prevClose = parseFloat(d.previous_close || price);
+    const change    = parseFloat((price - prevClose).toFixed(2));
+    const changePct = prevClose > 0 ? parseFloat(((change/prevClose)*100).toFixed(2)) : 0;
     return {
       ok:        true,
       price:     parseFloat(price.toFixed(2)),
-      change:    0,    // Twelve Data price endpoint — change needs separate call
-      changePct: 0,
-      prevClose: 0,
-      high:      0,
-      low:       0,
+      change,
+      changePct,
+      prevClose: parseFloat(prevClose.toFixed(2)),
+      high:      parseFloat((d.high||0)),
+      low:       parseFloat((d.low||0)),
+      name:      d.name || cleanTicker,
+      exchange:  d.exchange || '',
+      is15min:   d.is_market_open === false, // flag if delayed
       updatedAt: new Date().toLocaleTimeString('en-US',{timeZone:'America/Chicago',hour:'2-digit',minute:'2-digit'}),
     };
   } catch(e) {
@@ -1744,7 +1737,8 @@ async function triggerRefresh() {
   const now = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',timeZone:'America/Chicago'});
   document.getElementById('lastUpdateTime').textContent = now + ' CST';
   localStorage.setItem('ideepin_lastUpdate', now);
-  showToast(fetched > 0
+  showToast(fetched > 0 ? '⚠ Prices may be 15-min delayed on free tier' : '' );
+  if (fetched > 0) showToast(fetched > 0
     ? `\u2713 ${fetched} price${fetched>1?'s':''} updated \u00b7 ${failed>0?failed+' unavailable \u00b7 ':''}${now} CST`
     : `\u26a0 0 prices fetched \u00b7 ${failed} failed \u00b7 Check key/connection`
   );
@@ -1996,10 +1990,51 @@ function renderETFHoldings() {
   }).join('');
 }
 
+function calcXIRR(cashflows) {
+  // cashflows: [{date: Date, amount: number}] — negatives = investments, positive = current value
+  if (!cashflows || cashflows.length < 2) return null;
+  const MAX_ITER = 100, TOLERANCE = 1e-6;
+  let rate = 0.1;
+  for (let i = 0; i < MAX_ITER; i++) {
+    let npv = 0, dnpv = 0;
+    const t0 = cashflows[0].date.getTime();
+    cashflows.forEach(cf => {
+      const t = (cf.date.getTime() - t0) / (365.25 * 24 * 3600 * 1000);
+      const denom = Math.pow(1 + rate, t);
+      npv  += cf.amount / denom;
+      dnpv -= t * cf.amount / (denom * (1 + rate));
+    });
+    if (Math.abs(dnpv) < 1e-12) break;
+    const newRate = rate - npv / dnpv;
+    if (Math.abs(newRate - rate) < TOLERANCE) { rate = newRate; break; }
+    rate = newRate;
+    if (rate < -0.999) rate = -0.999;
+  }
+  return isFinite(rate) ? rate : null;
+}
+
 function updatePortfolioSummary(totalInvested, presentValue) {
   const mem = loadMemory();
   const total = totalInvested ?? mem.reduce((s,e) => s + (parseFloat(e.amount)||0), 0);
   document.getElementById('totalInvested').textContent = '$' + total.toFixed(2);
+
+  // XIRR calculation from memory entries
+  if (mem.length >= 1 && presentValue && presentValue > 0) {
+    try {
+      const cashflows = mem.map(e => ({
+        date:   new Date(e.date || e.timestamp || Date.now()),
+        amount: -(parseFloat(e.amount) || 0),
+      }));
+      cashflows.push({ date: new Date(), amount: presentValue });
+      const xirr = calcXIRR(cashflows);
+      if (xirr !== null) {
+        const xirrPct = (xirr * 100).toFixed(1);
+        document.getElementById('xirrVal').textContent = (xirr >= 0 ? '+' : '') + xirrPct + '%';
+        document.getElementById('xirrVal').style.color = xirr >= 0 ? 'var(--green)' : 'var(--red)';
+      }
+    } catch(e) { /* silent */ }
+  }
+
   if (presentValue && presentValue > 0) {
     const pnl = presentValue - total;
     const pnlPct = total > 0 ? ((pnl/total)*100) : 0;
@@ -2007,7 +2042,6 @@ function updatePortfolioSummary(totalInvested, presentValue) {
     document.getElementById('totalPnL').textContent = (pnl>=0?'+':'') + '$' + Math.abs(pnl).toFixed(2);
     document.getElementById('totalPnL').style.color = pnl >= 0 ? 'var(--green)' : 'var(--red)';
     document.getElementById('totalPnLPct').textContent = (pnlPct>=0?'+':'') + pnlPct.toFixed(2) + '%';
-    document.getElementById('xirrVal').textContent = '—';
   } else {
     document.getElementById('presentValue').textContent = Object.keys(LIVE_PRICES).length ? '—' : '— (press Refresh)';
     document.getElementById('totalPnL').textContent = '—';
@@ -2345,57 +2379,109 @@ function renderCharts() {
 
 function renderPortfolioChart() {
   const mem = loadMemory();
-  const pc = document.getElementById('portfolioChart')?.getContext('2d');
-  if (pc) {
+
+  // Portfolio value over time chart
+  const pcEl = document.getElementById('portfolioChart');
+  if (pcEl) {
     destroyChart('port');
+    const ctx = pcEl.getContext('2d');
     if (!mem.length) {
-      pc.canvas.parentElement.innerHTML += `<div style="text-align:center;color:var(--muted);padding:40px;font-size:12px">Add investments to see portfolio chart</div>`;
-      return;
+      ctx.clearRect(0, 0, pcEl.width, pcEl.height);
+      ctx.fillStyle = 'rgba(212,228,244,0.3)';
+      ctx.font = '12px DM Mono, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('Add investments to see portfolio chart', pcEl.width/2, pcEl.height/2);
+    } else {
+      const sorted = [...mem].sort((a,b) => new Date(a.date)-new Date(b.date));
+      let cum = 0;
+      const labels  = sorted.map(e => e.date ? e.date.slice(0,10) : '');
+      const amounts = sorted.map(e => { cum += (parseFloat(e.amount)||0); return parseFloat(cum.toFixed(2)); });
+      _charts.port = new Chart(ctx, {
+        type:'line',
+        data:{ labels,
+          datasets:[{
+            label:'Total Invested ($)',
+            data: amounts,
+            borderColor:'#28b4ff',
+            backgroundColor:'rgba(40,180,255,0.12)',
+            borderWidth:2, fill:true, tension:0.4, pointRadius:4,
+            pointBackgroundColor:'#28b4ff',
+          }]
+        },
+        options:{
+          responsive:true, maintainAspectRatio:false,
+          plugins:{ legend:{ labels:{ color:'rgba(212,228,244,0.7)', font:{size:10} }}},
+          scales:{
+            y:{ ticks:{ callback:v=>'$'+v, font:{size:9}, color:'rgba(212,228,244,0.5)' },
+                grid:{ color:'rgba(255,255,255,0.05)' }},
+            x:{ ticks:{ font:{size:9}, color:'rgba(212,228,244,0.5)', maxTicksLimit:8 },
+                grid:{ display:false }}
+          }
+        }
+      });
     }
-    // Build cumulative invested by date
-    const sorted = [...mem].sort((a,b) => new Date(a.date)-new Date(b.date));
-    let cumulative = 0;
-    const labels = sorted.map(e => e.date);
-    const invested = sorted.map(e => { cumulative += (parseFloat(e.amount)||0); return parseFloat(cumulative.toFixed(2)); });
-    _charts.port = new Chart(pc, {
-      type:'line',
-      data:{ labels,
-        datasets:[{ label:'Total Invested', data:invested,
-          borderColor:'var(--blue)', backgroundColor:'rgba(40,180,255,.1)', borderWidth:2, fill:true, tension:.4 }]},
-      options:{ responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-        scales:{ y:{ticks:{callback:v=>'$'+v,font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},
-          x:{ticks:{font:{size:9},maxTicksLimit:6},grid:{display:false}}}}
-    });
   }
 
-  // P&L chart — empty state
-  const pnl = document.getElementById('pnlChart')?.getContext('2d');
-  if (pnl) {
+  // P&L by position chart
+  const pnlEl = document.getElementById('pnlChart');
+  if (pnlEl) {
     destroyChart('pnl');
-    if (!mem.length) return;
+    const ctx2 = pnlEl.getContext('2d');
+    // Build P&L from live prices + memory
     const grouped = {};
     mem.forEach(e => {
-      const tk = e.stock.split(' ')[0].replace('—','').trim();
-      grouped[tk] = (grouped[tk]||0) + (parseFloat(e.amount)||0);
+      const tk = e.stock.split(/[\s—\-]/)[0].toUpperCase().trim();
+      if (!grouped[tk]) grouped[tk] = 0;
+      grouped[tk] += (parseFloat(e.amount)||0);
     });
+    const tickers = Object.keys(grouped);
+    if (!tickers.length || !Object.keys(LIVE_PRICES).length) {
+      ctx2.clearRect(0, 0, pnlEl.width, pnlEl.height);
+      ctx2.fillStyle = 'rgba(212,228,244,0.3)';
+      ctx2.font = '12px DM Mono, monospace';
+      ctx2.textAlign = 'center';
+      ctx2.fillText('Press Refresh to load live prices', pnlEl.width/2, pnlEl.height/2);
+      return;
+    }
+    const pnlValues = tickers.map(tk => {
+      const invested = grouped[tk];
+      const live = LIVE_PRICES[tk];
+      if (!live) return null;
+      // estimate units from avg cost
+      const mem_tk = mem.filter(e => e.stock.split(/[\s—\-]/)[0].toUpperCase().trim() === tk);
+      const totalUnits = mem_tk.reduce((s,e) => s + (parseFloat(e.amount)||0)/(parseFloat(e.buyPrice)||1), 0);
+      const curVal = totalUnits * live.price;
+      return parseFloat((curVal - invested).toFixed(2));
+    }).filter(v => v !== null);
+    const validTickers = tickers.filter(tk => LIVE_PRICES[tk]);
+    if (!validTickers.length) return;
     const cols = ['#28b4ff','#00e896','#ffb020','#a060ff','#f0c840','#ff6b35','#10d8c0','#ff3d6e'];
-    _charts.pnl = new Chart(pnl, {
+    _charts.pnl = new Chart(ctx2, {
       type:'bar',
-      data:{ labels:Object.keys(grouped), datasets:[{ label:'Invested',
-        data:Object.values(grouped),
-        backgroundColor:Object.keys(grouped).map((_,i)=>cols[i%cols.length]+'99'),
-        borderColor:Object.keys(grouped).map((_,i)=>cols[i%cols.length]),
-        borderWidth:1,borderRadius:3 }]},
-      options:{ responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-        scales:{ y:{ticks:{callback:v=>'$'+v,font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},
-          x:{ticks:{font:{size:9}},grid:{display:false}}}}
+      data:{
+        labels: validTickers,
+        datasets:[{
+          label:'P&L ($)',
+          data: pnlValues,
+          backgroundColor: pnlValues.map((v,i) => (v>=0?'rgba(0,232,150,0.7)':'rgba(255,61,110,0.7)')),
+          borderColor:      pnlValues.map((v,i) => (v>=0?'#00e896':'#ff3d6e')),
+          borderWidth:1, borderRadius:4,
+        }]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ display:false }},
+        scales:{
+          y:{ ticks:{ callback:v=>'$'+v, font:{size:9}, color:'rgba(212,228,244,0.5)' },
+              grid:{ color:'rgba(255,255,255,0.05)' }},
+          x:{ ticks:{ font:{size:9}, color:'rgba(212,228,244,0.5)' }, grid:{ display:false }}
+        }
+      }
     });
   }
 }
 
-// ════════════════════════════════════════════════════════════════
-// EXPORT / IMPORT — Solution 1: portable data file
-// ════════════════════════════════════════════════════════════════
+
 function exportPortfolioData() {
   const mem = loadMemory();
   if (!mem.length) { showToast('⚠ No data to export — add entries first'); return; }
@@ -2414,6 +2500,25 @@ function exportPortfolioData() {
   a.href=url; a.download=`ideepin_portfolio_${date}.json`; a.click();
   URL.revokeObjectURL(url);
   showToast(`✓ Exported ${mem.length} entries → ideepin_portfolio_${date}.json · Keep this file safe`);
+}
+
+function exportForGitHub() {
+  const mem = loadMemory();
+  if (!mem.length) { showToast('⚠ No data to save — add entries first'); return; }
+  const payload = {
+    _ideepin_version: '1.7.0',
+    _saved_at: new Date().toISOString(),
+    _entry_count: mem.length,
+    _instructions: 'Upload this file to your GitHub repo as portfolio_memory.json. iDeepin will load it automatically.',
+    portfolio: mem,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = 'portfolio_memory.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('✓ portfolio_memory.json downloaded — upload it to your GitHub repo ideepin/');
 }
 
 function importPortfolioData(input) {
@@ -2584,8 +2689,43 @@ renderCharts();
 updateDiagnostics();
 updatePortfolioSummary();
 
+// ── AUTO-LOAD from GitHub if configured ──
+async function loadFromGitHub() {
+  const ghUser = localStorage.getItem('ideepin_gh_user') || '';
+  if (!ghUser) return; // not configured
+  try {
+    const url = `https://raw.githubusercontent.com/${ghUser}/ideepin/main/portfolio_memory.json`;
+    const res  = await fetch(url + '?t=' + Date.now()); // cache-bust
+    if (!res.ok) return;
+    const data = await res.json();
+    const entries = data.portfolio || [];
+    if (!entries.length) return;
+    // Merge with local — don't overwrite newer local data
+    const local = loadMemory();
+    const localIds = new Set(local.map(e => e.id));
+    const fresh = entries.filter(e => !localIds.has(e.id));
+    if (fresh.length) {
+      saveMemory([...local, ...fresh]);
+      showToast(`✓ Loaded ${fresh.length} new entries from GitHub`);
+      renderHoldings(); renderETFHoldings(); renderPortfolioChart(); updatePortfolioSummary(); updateDiagnostics();
+    }
+  } catch(e) { /* silent — GitHub not configured or no file yet */ }
+}
+
+function saveGitHubUser(user) {
+  localStorage.setItem('ideepin_gh_user', user.trim());
+  showToast('✓ GitHub username saved · Auto-load active');
+}
+
 // Show API key panel if no key saved yet
 const _savedKey = getFinnhubKey();
+const _ghUser = localStorage.getItem('ideepin_gh_user') || '';
+if (_ghUser) {
+  const inp = document.getElementById('ghUserInput');
+  if (inp) inp.value = _ghUser;
+  // Auto-load from GitHub on startup
+  setTimeout(loadFromGitHub, 1500);
+}
 if (!_savedKey) {
   document.getElementById('finnhubKeyWrap').style.display = 'flex';
 } else {
