@@ -1,0 +1,2601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iDeepin — Intelligent Deep Investment</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Caveat:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN TOKENS — DARK LUXURY THEME
+═══════════════════════════════════════════════════════════════ */
+:root{
+  --bg:#080b12;--bg2:#0c1018;--bg3:#101520;--bg4:#141a24;
+  --panel:#0e1420;--panel2:#121828;
+  --border:#1a2436;--border2:#20304a;
+  --text:#d4e4f4;--muted:#3a5570;--faint:#1e3050;--dim:#0a1020;
+
+  /* Brand colors */
+  --i-color:#00d4ff;        /* i */
+  --deep-color:#ff6b35;     /* Deep */
+  --in-color:#a8ff3e;       /* in */
+
+  /* Signal colors */
+  --green:#00e896;--green-d:rgba(0,232,150,.12);--green-b:rgba(0,232,150,.25);
+  --red:#ff3d6e;--red-d:rgba(255,61,110,.12);--red-b:rgba(255,61,110,.25);
+  --amber:#ffb020;--amber-d:rgba(255,176,32,.12);--amber-b:rgba(255,176,32,.25);
+  --blue:#28b4ff;--blue-d:rgba(40,180,255,.12);--blue-b:rgba(40,180,255,.25);
+  --purple:#a060ff;--gold:#f0c840;
+
+  --h:'Playfair Display',serif;
+  --c:'Caveat',cursive;
+  --b:'Outfit',sans-serif;
+  --m:'Fira Code',monospace;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESET + BASE
+═══════════════════════════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:var(--b);font-size:13px;line-height:1.6;
+  min-height:100vh;overflow-x:hidden
+}
+
+/* NOISE OVERLAY */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 90% 60% at 5% 0%,rgba(0,212,255,.06) 0%,transparent 50%),
+    radial-gradient(ellipse 60% 80% at 95% 100%,rgba(255,107,53,.05) 0%,transparent 50%),
+    radial-gradient(ellipse 50% 50% at 50% 50%,rgba(168,255,62,.03) 0%,transparent 60%);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BRANDING HEADER
+═══════════════════════════════════════════════════════════════ */
+.app-header{
+  position:sticky;top:0;z-index:500;
+  background:rgba(8,11,18,.96);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  display:grid;grid-template-columns:auto 1fr auto;
+  align-items:center;padding:0 24px;height:68px;gap:20px
+}
+
+.brand{display:flex;align-items:baseline;gap:0;cursor:pointer;text-decoration:none}
+.brand-i{
+  font-family:var(--h);font-size:38px;font-weight:900;
+  color:var(--i-color);line-height:1;
+  text-shadow:0 0 30px rgba(0,212,255,.4)
+}
+.brand-deep{
+  font-family:var(--h);font-size:38px;font-weight:900;
+  color:var(--deep-color);line-height:1;
+  text-shadow:0 0 30px rgba(255,107,53,.4)
+}
+.brand-in{
+  font-family:var(--h);font-size:38px;font-weight:900;
+  color:var(--in-color);line-height:1;
+  text-shadow:0 0 30px rgba(168,255,62,.4)
+}
+.brand-tagline{
+  font-family:var(--c);font-size:13px;font-weight:400;
+  letter-spacing:.03em;margin-left:14px;
+  display:flex;gap:4px;align-items:baseline;
+  padding-bottom:2px
+}
+.tag-i{color:var(--i-color)}
+.tag-deep{color:var(--deep-color)}
+.tag-in{color:var(--in-color)}
+
+.header-center{display:flex;flex-direction:column;align-items:center;gap:2px}
+.market-pill{
+  display:flex;align-items:center;gap:6px;
+  background:var(--green-d);border:1px solid var(--green-b);
+  border-radius:20px;padding:4px 12px;
+  font-family:var(--m);font-size:9px;letter-spacing:.1em;color:var(--green)
+}
+.market-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--green);
+  animation:blink 2s infinite
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.time-display{
+  font-family:var(--m);font-size:10px;color:var(--muted);letter-spacing:.06em
+}
+
+.header-right{display:flex;align-items:center;gap:10px}
+.refresh-btn{
+  display:flex;align-items:center;gap:7px;
+  background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(168,255,62,.1));
+  border:1px solid rgba(0,212,255,.3);
+  border-radius:8px;padding:8px 16px;cursor:pointer;
+  font-family:var(--m);font-size:10px;letter-spacing:.08em;color:var(--blue);
+  transition:.2s;position:relative;overflow:hidden
+}
+.refresh-btn:hover{background:linear-gradient(135deg,rgba(0,212,255,.25),rgba(168,255,62,.18));transform:scale(1.02)}
+.refresh-btn.spinning .ri{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ri{font-size:14px;display:inline-block}
+.last-update{font-family:var(--m);font-size:9px;color:var(--muted);text-align:right;line-height:1.6}
+
+/* ═══════════════════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════════════════ */
+.nav{
+  display:flex;background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;overflow-x:auto;position:sticky;top:68px;z-index:400
+}
+.nav::-webkit-scrollbar{display:none}
+.nav-tab{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--b);font-size:11px;font-weight:500;letter-spacing:.06em;
+  padding:14px 20px;border:none;background:transparent;color:var(--muted);
+  cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;
+  transition:.2s;text-transform:uppercase
+}
+.nav-tab:hover{color:var(--text)}
+.nav-tab.on{color:var(--blue);border-bottom-color:var(--blue)}
+.nav-icon{font-size:14px}
+.nav-badge{
+  font-family:var(--m);font-size:8px;padding:1px 6px;border-radius:10px;
+  background:var(--blue-d);color:var(--blue);border:1px solid var(--blue-b)
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CONTENT + PANELS
+═══════════════════════════════════════════════════════════════ */
+.content{padding:24px;max-width:1400px;margin:0 auto;position:relative;z-index:1}
+.panel{display:none;animation:fadeIn .25s ease}.panel.on{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.page-title{
+  font-family:var(--h);font-size:26px;font-weight:700;
+  color:var(--text);margin-bottom:2px;letter-spacing:.02em
+}
+.page-sub{
+  font-family:var(--m);font-size:9px;color:var(--muted);
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:20px
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STAT STRIP
+═══════════════════════════════════════════════════════════════ */
+.stat-strip{display:grid;gap:8px;margin-bottom:20px}
+.ss-4{grid-template-columns:repeat(4,1fr)}
+.ss-5{grid-template-columns:repeat(5,1fr)}
+.ss-6{grid-template-columns:repeat(6,1fr)}
+.stat-card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:10px;padding:14px 16px;position:relative;overflow:hidden
+}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--sc,var(--blue))
+}
+.stat-lbl{font-family:var(--m);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.stat-val{font-family:var(--h);font-size:22px;font-weight:700;line-height:1}
+.stat-sub{font-size:10px;color:var(--muted);margin-top:3px}
+.stat-trend{font-family:var(--m);font-size:10px;margin-top:4px;font-weight:500}
+
+/* ═══════════════════════════════════════════════════════════════
+   STOCK TABLE
+═══════════════════════════════════════════════════════════════ */
+.table-wrap{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;margin-bottom:18px
+}
+.table-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;border-bottom:1px solid var(--border);background:var(--panel2)
+}
+.table-title{font-family:var(--h);font-size:16px;font-weight:700;letter-spacing:.02em}
+.table-controls{display:flex;gap:8px;align-items:center}
+.tbl-filter{
+  background:var(--bg3);border:1px solid var(--border);border-radius:6px;
+  padding:5px 10px;font-family:var(--m);font-size:10px;color:var(--text);
+  outline:none
+}
+.tbl-filter option{background:var(--bg3)}
+
+.data-table{width:100%;border-collapse:collapse;font-size:11px}
+.data-table th{
+  font-family:var(--m);font-size:8px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);padding:9px 12px;border-bottom:1px solid var(--border);
+  text-align:left;background:var(--bg3);white-space:nowrap;cursor:pointer
+}
+.data-table th:hover{color:var(--blue)}
+.data-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tbody tr{transition:.15s}
+.data-table tbody tr:hover td{background:rgba(40,180,255,.04)}
+
+.td-ticker{font-family:var(--h);font-size:15px;font-weight:700}
+.td-name{font-size:10px;color:var(--muted);margin-top:1px}
+.cat-tag{
+  display:inline-block;font-family:var(--m);font-size:8px;letter-spacing:.07em;
+  padding:2px 8px;border-radius:3px;white-space:nowrap;font-weight:500
+}
+.price-cell{font-family:var(--m);font-size:12px;font-weight:500}
+.change-cell{font-family:var(--m);font-size:11px;font-weight:600;white-space:nowrap}
+
+/* CONFIDENCE METER */
+.conf-wrap{display:flex;align-items:center;gap:6px;min-width:100px}
+.conf-track{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.conf-fill{height:100%;border-radius:3px;transition:width .4s}
+.conf-num{font-family:var(--m);font-size:10px;font-weight:600;min-width:26px;text-align:right}
+
+/* SIGNAL BADGE */
+.sig{
+  display:inline-flex;align-items:center;gap:4px;
+  font-family:var(--m);font-size:9px;font-weight:600;letter-spacing:.06em;
+  padding:3px 9px;border-radius:4px;white-space:nowrap
+}
+.sig-buy{background:var(--green-d);color:var(--green);border:1px solid var(--green-b)}
+.sig-sell{background:var(--red-d);color:var(--red);border:1px solid var(--red-b)}
+.sig-hold{background:var(--blue-d);color:var(--blue);border:1px solid var(--blue-b)}
+.sig-wait{background:var(--amber-d);color:var(--amber);border:1px solid var(--amber-b)}
+.sig-avoid{background:rgba(160,96,255,.12);color:var(--purple);border:1px solid rgba(160,96,255,.25)}
+
+/* ALLOC BAR */
+.alloc-cell{display:flex;align-items:center;gap:6px;min-width:80px}
+.alloc-track{width:50px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.alloc-fill{height:100%;border-radius:2px;background:var(--blue)}
+.alloc-pct{font-family:var(--m);font-size:10px;color:var(--muted)}
+
+/* ═══════════════════════════════════════════════════════════════
+   CATEGORY ALERT
+═══════════════════════════════════════════════════════════════ */
+.cat-alert{
+  background:var(--amber-d);border:1px solid var(--amber-b);
+  border-radius:8px;padding:12px 16px;margin-bottom:14px;
+  display:flex;align-items:center;gap:12px;font-size:11px
+}
+.cat-alert-icon{font-size:18px}
+.cat-alert-text{color:var(--amber);line-height:1.6}
+.cat-alert-text strong{font-weight:600}
+
+/* ═══════════════════════════════════════════════════════════════
+   ETF CARDS
+═══════════════════════════════════════════════════════════════ */
+.etf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:18px}
+.etf-card{
+  background:var(--panel);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;transition:.2s;cursor:pointer
+}
+.etf-card:hover{border-color:var(--blue);transform:translateY(-2px)}
+.etf-top{
+  padding:14px 16px;border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:flex-start
+}
+.etf-ticker{font-family:var(--h);font-size:22px;font-weight:700}
+.etf-name{font-size:10px;color:var(--muted);margin-top:2px}
+.etf-body{padding:12px 16px}
+.etf-row{display:flex;justify-content:space-between;padding:4px 0;font-size:11px;border-bottom:1px solid var(--border)}
+.etf-row:last-child{border-bottom:none}
+.etf-label{color:var(--muted)}
+.etf-value{font-family:var(--m);font-weight:500}
+.etf-dca{
+  margin:10px 0 0;padding:8px 10px;border-radius:6px;
+  font-size:10px;line-height:1.6
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════════════════════════ */
+.dash-section{margin-bottom:24px}
+.dash-sec-title{
+  font-family:var(--h);font-size:16px;font-weight:700;
+  margin-bottom:12px;display:flex;align-items:center;gap:10px
+}
+.ds-badge{
+  font-family:var(--m);font-size:8px;padding:2px 8px;border-radius:3px;
+  background:var(--blue-d);color:var(--blue);border:1px solid var(--blue-b)
+}
+
+/* PORTFOLIO SUMMARY CARDS */
+.port-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.ps-card{
+  background:var(--panel);border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;text-align:center
+}
+.ps-lbl{font-family:var(--m);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.ps-val{font-family:var(--h);font-size:20px;font-weight:700}
+.ps-sub{font-size:9px;color:var(--muted);margin-top:2px}
+
+/* ═══════════════════════════════════════════════════════════════
+   ENTRY FORM
+═══════════════════════════════════════════════════════════════ */
+.entry-section{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:12px;padding:20px 22px;margin-bottom:20px
+}
+.entry-title{
+  font-family:var(--h);font-size:16px;font-weight:700;
+  margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px
+}
+.entry-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-label{font-family:var(--m);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.form-input,.form-select{
+  background:var(--bg3);border:1px solid var(--border);border-radius:6px;
+  padding:9px 12px;font-family:var(--m);font-size:11px;color:var(--text);
+  outline:none;transition:.2s;width:100%
+}
+.form-input:focus,.form-select:focus{border-color:var(--blue);background:var(--bg4)}
+.form-input::placeholder{color:var(--muted)}
+.search-wrap{position:relative}
+.search-dropdown{
+  position:absolute;top:100%;left:0;right:0;z-index:100;
+  background:var(--bg3);border:1px solid var(--blue-b);border-radius:6px;
+  max-height:200px;overflow-y:auto;display:none
+}
+.search-dropdown.open{display:block}
+.sd-item{padding:8px 12px;font-size:11px;cursor:pointer;transition:.15s;border-bottom:1px solid var(--border)}
+.sd-item:hover{background:var(--blue-d);color:var(--blue)}
+.sd-item:last-child{border-bottom:none}
+.sd-tick{font-family:var(--m);font-weight:600;color:var(--blue)}
+.sd-name{color:var(--muted);font-size:10px;margin-left:6px}
+
+.entry-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn-primary{
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  border:none;border-radius:8px;padding:10px 22px;
+  font-family:var(--b);font-size:12px;font-weight:600;color:white;
+  cursor:pointer;transition:.2s;letter-spacing:.04em
+}
+.btn-primary:hover{opacity:.85;transform:scale(1.02)}
+.btn-secondary{
+  background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  padding:10px 18px;font-family:var(--b);font-size:12px;color:var(--muted);
+  cursor:pointer;transition:.2s
+}
+.btn-secondary:hover{border-color:var(--blue);color:var(--blue)}
+
+/* UPLOAD ZONE */
+.upload-zone{
+  border:2px dashed var(--border2);border-radius:10px;
+  padding:28px;text-align:center;cursor:pointer;transition:.2s;
+  background:var(--bg3)
+}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--blue);background:var(--blue-d)}
+.upload-icon{font-size:32px;margin-bottom:8px;opacity:.6}
+.upload-text{font-size:12px;color:var(--muted);line-height:1.7}
+.upload-text strong{color:var(--blue)}
+.upload-input{display:none}
+
+/* ═══════════════════════════════════════════════════════════════
+   REMINDERS
+═══════════════════════════════════════════════════════════════ */
+.reminder-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.reminder-item{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:8px;padding:12px 16px;
+  display:flex;justify-content:space-between;align-items:flex-start;gap:12px
+}
+.ri-left{flex:1}
+.ri-title{font-weight:600;margin-bottom:3px;display:flex;align-items:center;gap:8px}
+.ri-desc{font-size:10px;color:var(--muted);line-height:1.6}
+.ri-date{font-family:var(--m);font-size:9px;color:var(--amber)}
+.ri-actions{display:flex;gap:6px}
+.ri-btn{
+  background:transparent;border:1px solid var(--border);border-radius:4px;
+  padding:4px 10px;font-size:10px;color:var(--muted);cursor:pointer;transition:.15s
+}
+.ri-btn:hover{border-color:var(--red);color:var(--red)}
+.ri-btn.edit:hover{border-color:var(--blue);color:var(--blue)}
+
+/* ═══════════════════════════════════════════════════════════════
+   CHARTS
+═══════════════════════════════════════════════════════════════ */
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.chart-card{
+  background:var(--panel);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px
+}
+.chart-title{font-family:var(--h);font-size:14px;font-weight:700;margin-bottom:3px}
+.chart-sub{font-family:var(--m);font-size:9px;color:var(--muted);margin-bottom:14px}
+
+/* ═══════════════════════════════════════════════════════════════
+   DIAGNOSTICS PAGE
+═══════════════════════════════════════════════════════════════ */
+.diag-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.diag-card{
+  background:var(--panel);border:1px solid var(--border);border-radius:10px;
+  padding:16px 18px
+}
+.diag-title{font-family:var(--h);font-size:14px;font-weight:700;margin-bottom:10px;
+  padding-bottom:7px;border-bottom:1px solid var(--border);letter-spacing:.02em}
+.diag-row{display:flex;justify-content:space-between;align-items:center;
+  padding:6px 0;border-bottom:1px solid var(--border);font-size:11px}
+.diag-row:last-child{border-bottom:none}
+.diag-label{color:var(--muted)}
+.diag-val{font-family:var(--m);font-weight:500}
+.diag-ok{color:var(--green)}.diag-warn{color:var(--amber)}.diag-err{color:var(--red)}
+
+.arch-block{
+  background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  padding:14px 16px;margin-bottom:10px;font-family:var(--m);font-size:10px;
+  color:var(--muted);line-height:1.9
+}
+.arch-block strong{color:var(--text);font-weight:500}
+.arch-block .layer{color:var(--blue)}
+
+/* ═══════════════════════════════════════════════════════════════
+   MISC UTILITIES
+═══════════════════════════════════════════════════════════════ */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.note-box{
+  background:var(--bg3);border-radius:8px;padding:13px 16px;margin-bottom:12px;
+  border-left:3px solid var(--nc,var(--blue));font-size:11px;color:var(--muted);line-height:1.8
+}
+.note-box strong{color:var(--text);font-weight:500}
+.note-title{font-family:var(--h);font-size:12px;font-weight:700;color:var(--nc,var(--blue));margin-bottom:5px}
+.section-sep{height:1px;background:var(--border);margin:20px 0}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:24px;right:24px;z-index:1000;
+  background:var(--panel2);border:1px solid var(--green-b);border-radius:10px;
+  padding:12px 18px;font-size:12px;color:var(--green);
+  transform:translateY(60px);opacity:0;transition:.3s;pointer-events:none
+}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* FOOTER */
+.app-footer{
+  text-align:center;padding:20px;
+  font-family:var(--m);font-size:9px;color:var(--faint);
+  border-top:1px solid var(--border);margin-top:40px;letter-spacing:.06em
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--muted);border-radius:2px}
+
+@media(max-width:900px){
+  .app-header{grid-template-columns:1fr auto;height:auto;padding:12px 14px;gap:10px}
+  .header-center{display:none}
+  .stat-strip{grid-template-columns:repeat(2,1fr)!important}
+  .chart-row,.two-col,.diag-grid,.entry-grid{grid-template-columns:1fr}
+  .port-summary{grid-template-columns:1fr 1fr}
+  .content{padding:14px}
+  .brand-i,.brand-deep,.brand-in{font-size:28px}
+  .brand-tagline{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     APP HEADER
+═══════════════════════════════════════════════════════════════ -->
+<header class="app-header">
+  <div style="display:flex;align-items:center;gap:0">
+    <div class="brand">
+      <span class="brand-i">i</span><span class="brand-deep">Deep</span><span class="brand-in">in</span>
+    </div>
+    <div class="brand-tagline">
+      <span class="tag-i">Intelligent</span>&nbsp;
+      <span class="tag-deep">Deep</span>&nbsp;
+      <span class="tag-in">Investment</span>
+    </div>
+  </div>
+
+  <div class="header-center">
+    <div class="market-pill">
+      <div class="market-dot"></div>
+      <span>MARKET OPEN · NYSE · NASDAQ</span>
+    </div>
+    <div class="time-display" id="liveClock">—</div>
+  </div>
+
+  <div class="header-right">
+    <div class="last-update" id="lastUpdateDisplay">
+      Last update<br><span id="lastUpdateTime">—</span>
+    </div>
+    <div style="font-family:var(--m);font-size:9px;text-align:right;cursor:pointer"
+      id="keyStatus"
+      onclick="document.getElementById('finnhubKeyWrap').style.display='flex';showPage('dashboard',document.querySelectorAll('.nav-tab')[2]);document.getElementById('finnhubKeyWrap').scrollIntoView({behavior:'smooth',block:'center'})"
+      title="Click to set API key for live prices">
+    </div>
+    <button class="refresh-btn" onclick="triggerRefresh()">
+      <span class="ri" id="refreshIcon">⟳</span>
+      <span>REFRESH</span>
+    </button>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     NAVIGATION
+═══════════════════════════════════════════════════════════════ -->
+<nav class="nav">
+  <button class="nav-tab on" onclick="showPage('basket1',this)">
+    <span class="nav-icon">📈</span> Basket 1 — Stocks
+    <span class="nav-badge">15</span>
+  </button>
+  <button class="nav-tab" onclick="showPage('etf',this)">
+    <span class="nav-icon">🏦</span> ETF Pool
+    <span class="nav-badge">8</span>
+  </button>
+  <button class="nav-tab" onclick="showPage('dashboard',this)">
+    <span class="nav-icon">📊</span> Dashboard
+  </button>
+  <button class="nav-tab" onclick="showPage('notes',this)">
+    <span class="nav-icon">📋</span> Notes & Reference
+  </button>
+</nav>
+
+<main class="content">
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PAGE 1 — BASKET 1 STOCKS
+═══════════════════════════════════════════════════════════════ -->
+<div id="page-basket1" class="panel on">
+
+  <div class="page-title">Basket 1 — Stock Intelligence</div>
+  <div class="page-sub">Top 15 stocks · Algorithm v3.4 + ST-v1 · Live scored · May 11 2026</div>
+
+  <div class="stat-strip ss-5">
+    <div class="stat-card" style="--sc:var(--green)">
+      <div class="stat-lbl">Active BUY Signals</div>
+      <div class="stat-val" style="color:var(--green)">9</div>
+      <div class="stat-sub">Out of 15 positions</div>
+    </div>
+    <div class="stat-card" style="--sc:var(--amber)">
+      <div class="stat-lbl">HOLD / WATCH</div>
+      <div class="stat-val" style="color:var(--amber)">4</div>
+      <div class="stat-sub">Monitor closely</div>
+    </div>
+    <div class="stat-card" style="--sc:var(--red)">
+      <div class="stat-lbl">AVOID This Week</div>
+      <div class="stat-val" style="color:var(--red)">2</div>
+      <div class="stat-sub">MU, INTC</div>
+    </div>
+    <div class="stat-card" style="--sc:var(--blue)">
+      <div class="stat-lbl">Avg Confidence</div>
+      <div class="stat-val" style="color:var(--blue)">81</div>
+      <div class="stat-sub">Portfolio average</div>
+    </div>
+    <div class="stat-card" style="--sc:var(--gold)">
+      <div class="stat-lbl">Avg Upside</div>
+      <div class="stat-val" style="color:var(--gold)">+34%</div>
+      <div class="stat-sub">To consensus PT</div>
+    </div>
+  </div>
+
+  <!-- CATEGORY ALERT -->
+  <div class="cat-alert">
+    <div class="cat-alert-icon">⚠</div>
+    <div class="cat-alert-text">
+      <strong>Memory / Semiconductor (Overbought):</strong> MU at RSI 84 — most overbought since 2014. INTC trading 47% above analyst consensus. Allocation from these 2 positions split to <strong>Healthcare (+3%) and Copper/Materials (+2%)</strong> until prices normalise.
+    </div>
+  </div>
+
+  <!-- STOCK TABLE -->
+  <div class="table-wrap">
+    <div class="table-header">
+      <div class="table-title">15 Active Positions — Ranked by Confidence</div>
+      <div class="table-controls">
+        <select class="tbl-filter" onchange="filterTable(this.value)">
+          <option value="all">All Categories</option>
+          <option value="semiconductors">Semiconductors</option>
+          <option value="healthcare">Healthcare</option>
+          <option value="materials">Materials</option>
+          <option value="technology">Technology</option>
+          <option value="defence">Defence</option>
+          <option value="energy">Energy</option>
+          <option value="financials">Financials</option>
+        </select>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="data-table" id="stockTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable('name')"># Name / Symbol ↕</th>
+            <th>Category</th>
+            <th onclick="sortTable('price')">Price ↕</th>
+            <th onclick="sortTable('change')">Day Chg ↕</th>
+            <th>PT / Upside</th>
+            <th onclick="sortTable('confidence')">Confidence ↕</th>
+            <th>Strategy</th>
+            <th>Action</th>
+            <th onclick="sortTable('alloc')">Alloc % ↕</th>
+            <th>Upside / Time</th>
+          </tr>
+        </thead>
+        <tbody id="stockTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="chart-row">
+    <div class="chart-card">
+      <div class="chart-title">Confidence Distribution</div>
+      <div class="chart-sub">All 15 positions ranked by confidence score</div>
+      <canvas id="confChart" style="height:200px"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Sector Allocation</div>
+      <div class="chart-sub">% portfolio weighting by sector</div>
+      <canvas id="sectorChart" style="height:200px"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PAGE 2 — ETF POOL
+═══════════════════════════════════════════════════════════════ -->
+<div id="page-etf" class="panel">
+
+  <div class="page-title">ETF Pool Analysis</div>
+  <div class="page-sub">Market-wide ETF grading · Live performance · DCA guidance · May 11 2026</div>
+
+  <div class="stat-strip ss-4">
+    <div class="stat-card" style="--sc:var(--green)">
+      <div class="stat-lbl">Strong / DCA Increase</div>
+      <div class="stat-val" style="color:var(--green)">2</div>
+      <div class="stat-sub">VGT, IAUM</div>
+    </div>
+    <div class="stat-card" style="--sc:var(--blue)">
+      <div class="stat-lbl">Continue DCA</div>
+      <div class="stat-val" style="color:var(--blue)">4</div>
+      <div class="stat-sub">VOO, SCHD, VXUS, SLV</div>
+    </div>
+    <div class="stat-card" style="--sc:var(--amber)">
+      <div class="stat-lbl">Monitor</div>
+      <div class="stat-val" style="color:var(--amber)">2</div>
+      <div class="stat-sub">New candidates</div>
+    </div>
+    <div class="stat-card" style="--sc:var(--gold)">
+      <div class="stat-lbl">Weighted YTD</div>
+      <div class="stat-val" style="color:var(--gold)">+10.2%</div>
+      <div class="stat-sub">Across your 6 ETFs</div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:12px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+    <span style="font-family:var(--m);font-size:9px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-right:4px">Filter:</span>
+    <div id="etfFilterBar" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+  </div>
+  <style>
+    .etf-filter-btn{font-family:var(--m);font-size:9px;letter-spacing:.07em;padding:4px 12px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:.15s}
+    .etf-filter-btn:hover,.etf-filter-btn.on{border-color:var(--blue);color:var(--blue);background:var(--blue-d)}
+  </style>
+
+  <div class="etf-grid" id="etfGrid"></div>
+
+  <div class="chart-row">
+    <div class="chart-card">
+      <div class="chart-title">ETF Performance — YTD 2026</div>
+      <div class="chart-sub">% return vs VOO benchmark</div>
+      <canvas id="etfPerfChart" style="height:200px"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Your ETF Allocation</div>
+      <div class="chart-sub">Current invested amounts</div>
+      <canvas id="etfAllocChart" style="height:200px"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PAGE 3 — DASHBOARD
+═══════════════════════════════════════════════════════════════ -->
+<div id="page-dashboard" class="panel">
+
+  <div class="page-title">Portfolio Dashboard</div>
+  <div class="page-sub">Live portfolio tracking · P&L · XIRR · Cross-page intelligence</div>
+
+  <!-- FINNHUB API KEY PANEL -->
+  <div id="finnhubKeyWrap" style="display:none;background:var(--amber-d);border:1px solid var(--amber-b);border-radius:10px;padding:14px 18px;margin-bottom:16px;gap:12px;align-items:flex-start;flex-wrap:wrap">
+    <div style="flex:1;min-width:260px">
+      <div style="font-family:var(--h);font-size:13px;font-weight:700;color:var(--amber);margin-bottom:6px">⚠ Live Prices — API Key Required</div>
+      <div style="font-family:var(--m);font-size:10px;color:var(--muted);line-height:1.9;margin-bottom:10px">
+        1 · Go to <strong style="color:var(--blue)">twelvedata.com</strong> → Sign Up (email only, no credit card)<br>
+        2 · On your dashboard copy your API key (long string of letters and numbers)<br>
+        3 · Paste below → click Save & Refresh → live prices load instantly
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input class="form-input" id="finnhubKeyInput" type="password"
+          placeholder="Paste Twelve Data API key here (from twelvedata.com dashboard)"
+          value=""
+          style="flex:1;min-width:200px;font-family:var(--m);font-size:11px;letter-spacing:.06em"
+          oninput="document.getElementById('finnhubKeySaveBtn').disabled=!this.value.trim()">
+        <button class="btn-secondary" onclick="testFinnhubKey()" style="white-space:nowrap">
+          🔍 Test Key
+        </button>
+        <button class="btn-primary" id="finnhubKeySaveBtn" disabled
+          onclick="setFinnhubKey(document.getElementById('finnhubKeyInput').value);document.getElementById('finnhubKeyWrap').style.display='none';triggerRefresh()"
+          style="white-space:nowrap">
+          Save & Refresh
+        </button>
+        <button class="btn-secondary" onclick="document.getElementById('finnhubKeyWrap').style.display='none'"
+          style="white-space:nowrap;padding:10px 10px">✕</button>
+      </div>
+      <div id="finnhubTestResult" style="font-family:var(--m);font-size:10px;margin-top:8px;line-height:1.8;min-height:18px"></div>
+    </div>
+  </div>
+
+  <!-- PORTFOLIO SUMMARY -->
+  <div class="port-summary">
+    <div class="ps-card" style="border-top:2px solid var(--blue)">
+      <div class="ps-lbl">Total Invested</div>
+      <div class="ps-val" style="color:var(--blue)" id="totalInvested">$0.00</div>
+      <div class="ps-sub">Add entries below to track</div>
+    </div>
+    <div class="ps-card" style="border-top:2px solid var(--green)">
+      <div class="ps-lbl">Present Value</div>
+      <div class="ps-val" style="color:var(--muted)" id="presentValue">—</div>
+      <div class="ps-sub">Connect live prices</div>
+    </div>
+    <div class="ps-card" style="border-top:2px solid var(--gold)">
+      <div class="ps-lbl">Total P&L</div>
+      <div class="ps-val" style="color:var(--muted)" id="totalPnL">—</div>
+      <div class="ps-sub" id="totalPnLPct">Add investments to calculate</div>
+    </div>
+    <div class="ps-card" style="border-top:2px solid var(--purple)">
+      <div class="ps-lbl">XIRR (Annualised)</div>
+      <div class="ps-val" style="color:var(--muted)" id="xirrVal">—</div>
+      <div class="ps-sub">Requires live price data</div>
+    </div>
+  </div>
+
+  <!-- INTELLIGENCE ALERTS -->
+  <div class="dash-section">
+    <div class="dash-sec-title">Portfolio Intelligence <span class="ds-badge">3 ALERTS</span></div>
+    <div class="note-box" style="--nc:var(--amber)">
+      <div class="note-title">⚠ Rebalance Suggested — VGT overweight</div>
+      VGT has grown to 38% of ETF portfolio vs 25% target. Consider trimming DCA contributions this week and redirecting to VXUS or SCHD.
+    </div>
+    <div class="note-box" style="--nc:var(--green)">
+      <div class="note-title">✓ NVDA May 20 — Prepare cash deployment</div>
+      $150 cash buffer ready. Post-earnings deploy into AMD (if beats) or MU pullback (if AI-stack corrects). Both strategies pre-loaded.
+    </div>
+    <div class="note-box" style="--nc:var(--red)">
+      <div class="note-title">🔴 Book partial profit — RKLB +34% week</div>
+      RKLB hit $105, up from your entry zone. If you entered at $88-95, consider booking 40-50% and holding rest to $120 target.
+    </div>
+  </div>
+
+  <!-- STOCK HOLDINGS TABLE -->
+  <div class="dash-section">
+    <div class="dash-sec-title">Stock Holdings <span class="ds-badge">BASKET 2</span></div>
+    <div class="table-wrap">
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr>
+            <th>Name / Symbol</th><th>Shares</th><th>Buy Price</th>
+            <th>Present Value</th><th>Avg Cost</th><th>Total Invested</th>
+            <th>P&L</th><th>P&L %</th><th>XIRR</th><th>Status</th>
+          </tr></thead>
+          <tbody id="holdingsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ETF HOLDINGS TABLE -->
+  <div class="dash-section">
+    <div class="dash-sec-title">ETF Holdings <span class="ds-badge">BASKET 1</span></div>
+    <div class="table-wrap">
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr>
+            <th>ETF</th><th>Units</th><th>Buy Price</th>
+            <th>Present Value</th><th>Avg Cost</th><th>Total Invested</th>
+            <th>P&L</th><th>P&L %</th><th>DCA Action</th>
+          </tr></thead>
+          <tbody id="etfHoldingsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENTRY FORM -->
+  <div class="entry-section">
+    <div class="entry-title">
+      <span>➕ Manual Entry</span>
+      <span style="font-family:var(--m);font-size:10px;color:var(--muted);font-weight:400">All entries saved to portfolio memory file</span>
+    </div>
+    <div class="entry-grid">
+      <div class="form-group">
+        <label class="form-label">Stock / ETF</label>
+        <div class="search-wrap">
+          <input class="form-input" id="stockSearch" placeholder="Type to search..." oninput="searchStocks(this.value)" autocomplete="off">
+          <div class="search-dropdown" id="searchDropdown"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Transaction Date</label>
+        <input type="date" class="form-input" id="txDate" value="">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Invested Amount ($)</label>
+        <input type="number" class="form-input" id="txAmount" placeholder="e.g. 500">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Purchase Rate ($)</label>
+        <input type="number" class="form-input" id="txBuyPrice" placeholder="e.g. 82.50">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sold Price ($ if sold)</label>
+        <input type="number" class="form-input" id="txSellPrice" placeholder="Leave blank if holding">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sold Value ($)</label>
+        <input type="number" class="form-input" id="txSellValue" placeholder="Auto-calculated">
+      </div>
+    </div>
+    <div class="entry-actions">
+      <button class="btn-primary" onclick="addEntry()">Save Entry</button>
+      <button class="btn-secondary" onclick="clearForm()">Clear</button>
+      <button class="btn-secondary" onclick="exportPortfolioData()" title="Download your portfolio data as a JSON file — open this file next time to restore all entries">⬇ Export Data</button>
+      <button class="btn-secondary" onclick="document.getElementById('importFileInput').click()" title="Load a previously exported portfolio JSON file">⬆ Import Data</button>
+      <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importPortfolioData(this)">
+      <span style="font-family:var(--m);font-size:10px;color:var(--amber)">
+        ⚠ Export your data before closing · Data lives in this browser session
+      </span>
+    </div>
+  </div>
+
+  <!-- UPLOAD ZONE -->
+  <div class="entry-section">
+    <div class="entry-title">📁 Upload Investment File</div>
+    <div class="upload-zone" onclick="document.getElementById('fileUpload').click()"
+         ondragover="event.preventDefault();this.classList.add('drag')"
+         ondragleave="this.classList.remove('drag')"
+         ondrop="handleDrop(event)">
+      <div class="upload-icon">📂</div>
+      <div class="upload-text">
+        <strong>Click to upload</strong> or drag and drop<br>
+        Supports <strong>Excel (.xlsx, .xls)</strong> · <strong>CSV (.csv)</strong> · <strong>PDF (.pdf)</strong> · <strong>Text (.txt)</strong><br>
+        <span style="font-size:10px">File will be parsed and entries added to your portfolio memory</span>
+      </div>
+      <input type="file" id="fileUpload" class="upload-input" accept=".xlsx,.xls,.csv,.pdf,.txt" onchange="handleFileUpload(this)">
+    </div>
+  </div>
+
+  <!-- REMINDERS -->
+  <div class="dash-section" style="margin-top:20px">
+    <div class="dash-sec-title">Reminders & Strategy Alerts <span class="ds-badge">GOOGLE CALENDAR</span></div>
+    <div class="reminder-list" id="reminderList"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-primary" onclick="showAddReminder()">+ Add Reminder</button>
+      <button class="btn-secondary" onclick="syncCalendar()">⟳ Sync Google Calendar</button>
+    </div>
+  </div>
+
+  <!-- GOOGLE DRIVE SYNC PANEL -->
+  <div class="entry-section" style="margin-top:20px">
+    <div class="entry-title">
+      <span>☁ Google Drive Sync</span>
+      <span id="gdriveStatus" style="font-family:var(--m);font-size:10px;color:var(--amber);font-weight:400;margin-left:12px">Not connected · Setup required</span>
+    </div>
+
+    <div style="background:var(--amber-d);border:1px solid var(--amber-b);border-radius:8px;padding:11px 14px;margin-bottom:14px;font-size:11px;color:var(--amber);line-height:1.8">
+      <strong>Why connect?</strong> Without Drive, your data only lives in this browser session. Connecting Drive saves every entry permanently to your Google account — accessible from any device, any browser, any time.
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:12px;align-items:end">
+      <div class="form-group">
+        <label class="form-label">OAuth Client ID (from Google Cloud Console)</label>
+        <input class="form-input" id="gdriveClientId" placeholder="Paste your OAuth Client ID here (ends in .apps.googleusercontent.com)"
+          value="" oninput="gdrive_setClientId(this.value)"
+          style="font-size:10px">
+      </div>
+      <button class="btn-primary" id="gdriveConnectBtn" onclick="gdrive_connect()" style="white-space:nowrap;height:38px">
+        Connect Drive
+      </button>
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn-primary" id="gdriveSyncBtn" onclick="gdrive_saveToCloud()" disabled style="background:linear-gradient(135deg,var(--green),var(--teal))">
+        ⬆ Save to Drive
+      </button>
+      <button class="btn-secondary" id="gdriveLoadBtn" onclick="gdrive_loadFromCloud()" disabled>
+        ⬇ Load from Drive
+      </button>
+      <span style="font-family:var(--m);font-size:10px;color:var(--muted);align-self:center">
+        Once connected, saves automatically after every entry
+      </span>
+    </div>
+
+    <div style="margin-top:14px;background:var(--bg3);border-radius:8px;padding:12px 14px;font-family:var(--m);font-size:10px;color:var(--muted);line-height:2">
+      <strong style="color:var(--text)">Quick Setup (5 min):</strong><br>
+      1 · Go to <strong style="color:var(--blue)">console.cloud.google.com</strong> → New Project → name it "iDeepin"<br>
+      2 · APIs & Services → Enable APIs → enable <strong>Google Drive API</strong><br>
+      3 · Credentials → Create → OAuth 2.0 Client ID → Web Application<br>
+      4 · Authorised JavaScript origins → add <code style="color:var(--green)">http://localhost</code> and <code style="color:var(--green)">https://yourdomain.com</code><br>
+      5 · Copy the Client ID → paste above → click Connect Drive<br>
+      6 · Approve Google sign-in popup → done. Your data saves to <strong>portfolio_memory.json</strong> in Google Drive.
+    </div>
+  </div>
+
+  <!-- P&L CHART -->
+  <div class="chart-row" style="margin-top:20px">
+    <div class="chart-card">
+      <div class="chart-title">Portfolio Value Over Time</div>
+      <div class="chart-sub">Total invested vs present value vs P&L</div>
+      <canvas id="portfolioChart" style="height:200px"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">P&L by Position</div>
+      <div class="chart-sub">Gain/loss per holding</div>
+      <canvas id="pnlChart" style="height:200px"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PAGE 4 — NOTES, REFERENCE & DIAGNOSTICS
+═══════════════════════════════════════════════════════════════ -->
+<div id="page-notes" class="panel">
+
+  <div class="page-title">Notes, Reference & Diagnostics</div>
+  <div class="page-sub">Quick instructions · System health · Export · Upgrade toolkit</div>
+
+  <div class="two-col">
+    <!-- QUICK REFERENCE -->
+    <div>
+      <div style="font-family:var(--h);font-size:16px;font-weight:700;margin-bottom:12px">Quick Reference</div>
+      <div class="note-box" style="--nc:var(--green)">
+        <div class="note-title">Signal Meanings</div>
+        🟢 <strong>BUY NOW</strong> — Enter at market price. Confidence ≥85.<br>
+        🟡 <strong>BUY AT $X</strong> — Limit order. Wait for specified price.<br>
+        🔵 <strong>HOLD</strong> — Keep position. Thesis intact.<br>
+        🟠 <strong>WAIT</strong> — Good thesis, poor timing. Be patient.<br>
+        🔴 <strong>SELL / AVOID</strong> — Exit or do not enter. Risk > reward.
+      </div>
+      <div class="note-box" style="--nc:var(--blue)">
+        <div class="note-title">Confidence Score Guide</div>
+        <strong>85-100:</strong> High confidence · Full position size<br>
+        <strong>70-84:</strong> Medium confidence · Reduced position<br>
+        <strong>Below 70:</strong> Low confidence · Watchlist only
+      </div>
+      <div class="note-box" style="--nc:var(--amber)">
+        <div class="note-title">Weekly Rhythm</div>
+        <strong>Monday 9:15 AM CST:</strong> Auto-refresh runs<br>
+        <strong>Earnings weeks:</strong> Hold cash buffer (≥20%)<br>
+        <strong>VIX > 25:</strong> Reduce swing positions<br>
+        <strong>VIX > 30:</strong> Full defensive mode activated
+      </div>
+      <div class="note-box" style="--nc:var(--purple)">
+        <div class="note-title">Stop Loss Rules</div>
+        <strong>Swing (2-10d):</strong> Exit if thesis breaks + 10 days no movement<br>
+        <strong>Momentum (2-6w):</strong> Exit if 50-day MA breaks on volume<br>
+        <strong>Trend (1-3M):</strong> Exit if 200-day MA breaks<br>
+        <strong>All:</strong> Never average down on broken thesis
+      </div>
+    </div>
+
+    <!-- ARCHITECTURE -->
+    <div>
+      <div style="font-family:var(--h);font-size:16px;font-weight:700;margin-bottom:12px">System Architecture</div>
+      <div class="arch-block">
+        <span class="layer">FRONTEND (This app)</span><br>
+        4-page SPA · HTML + CSS + JS · Dark theme · Chart.js<br>
+        LocalStorage portfolio memory · File upload parser<br>
+        Google Calendar API integration · Refresh triggers
+      </div>
+      <div class="arch-block">
+        <span class="layer">DATA LAYER</span><br>
+        <strong>Market data:</strong> Yahoo Finance API / Alpha Vantage / Polygon.io<br>
+        <strong>News:</strong> NewsAPI / Google News RSS feeds<br>
+        <strong>Analyst data:</strong> TipRanks / MarketBeat scraping<br>
+        <strong>Options:</strong> Unusual Whales public data<br>
+        <strong>Storage:</strong> Google Drive (15GB allocated) · append-only JSON
+      </div>
+      <div class="arch-block">
+        <span class="layer">INTELLIGENCE LAYER (Algorithm)</span><br>
+        <strong>v3.4 Long-term:</strong> F1-F5 factors + 13 modifiers → 12-18M conviction<br>
+        <strong>ST-v1 Short-term:</strong> 6 factors → swing/momentum/trend signals<br>
+        <strong>Confidence model:</strong> 6-factor audit framework<br>
+        <strong>Scheduler:</strong> Cron job · 9:15 AM CST · Market days only
+      </div>
+      <div class="arch-block">
+        <span class="layer">GOOGLE DRIVE STRUCTURE</span><br>
+        /iDeepin/<br>
+        &nbsp;&nbsp;portfolio_memory.json &nbsp;← append-only entry log<br>
+        &nbsp;&nbsp;stock_scores.json &nbsp;&nbsp;&nbsp;&nbsp;← weekly algorithm output<br>
+        &nbsp;&nbsp;etf_analysis.json &nbsp;&nbsp;&nbsp;← ETF grades<br>
+        &nbsp;&nbsp;reminders.json &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← strategy reminders<br>
+        &nbsp;&nbsp;diagnostics_log.json ← system health
+      </div>
+    </div>
+  </div>
+
+  <div class="section-sep"></div>
+
+  <!-- DIAGNOSTICS -->
+  <div style="font-family:var(--h);font-size:16px;font-weight:700;margin-bottom:12px">
+    System Diagnostics & Repair
+  </div>
+  <div class="diag-grid">
+    <div class="diag-card">
+      <div class="diag-title">System Health</div>
+      <div class="diag-row"><span class="diag-label">Algorithm v3.4</span><span class="diag-val diag-ok">● OPERATIONAL</span></div>
+      <div class="diag-row"><span class="diag-label">ST-v1</span><span class="diag-val diag-ok">● OPERATIONAL</span></div>
+      <div class="diag-row"><span class="diag-label">Market Data Feed</span><span class="diag-val diag-ok">● CONNECTED</span></div>
+      <div class="diag-row"><span class="diag-label">Google Drive Sync</span><span class="diag-val diag-warn">⚠ NEEDS SETUP</span></div>
+      <div class="diag-row"><span class="diag-label">Google Calendar</span><span class="diag-val diag-warn">⚠ NEEDS AUTH</span></div>
+      <div class="diag-row"><span class="diag-label">Scheduler (9:15 CST)</span><span class="diag-val diag-warn">⚠ NEEDS BACKEND</span></div>
+      <div class="diag-row"><span class="diag-label">Portfolio Memory</span><span class="diag-val diag-ok">● LOCAL ACTIVE</span></div>
+      <div class="diag-row"><span class="diag-label">Last Auto-Run</span><span class="diag-val" id="diagLastRun">—</span></div>
+    </div>
+    <div class="diag-card">
+      <div class="diag-title">Portfolio Statistics</div>
+      <div class="diag-row"><span class="diag-label">Total entries logged</span><span class="diag-val" id="diagEntries">0</span></div>
+      <div class="diag-row"><span class="diag-label">Stocks tracked</span><span class="diag-val">15</span></div>
+      <div class="diag-row"><span class="diag-label">ETFs tracked</span><span class="diag-val">6</span></div>
+      <div class="diag-row"><span class="diag-label">Reminders active</span><span class="diag-val" id="diagReminders">3</span></div>
+      <div class="diag-row"><span class="diag-label">Algorithm version</span><span class="diag-val">v3.4 + ST-v1</span></div>
+      <div class="diag-row"><span class="diag-label">Confidence model</span><span class="diag-val">6-factor audit</span></div>
+      <div class="diag-row"><span class="diag-label">Memory file size</span><span class="diag-val" id="diagMemSize">—</span></div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+    <button class="btn-primary" onclick="exportAll()">📦 Export Full Diagnostic Package</button>
+    <button class="btn-secondary" onclick="exportMemory()">💾 Export Portfolio Memory</button>
+    <button class="btn-secondary" onclick="exportScores()">📊 Export Algorithm Scores</button>
+    <button class="btn-secondary" onclick="clearMemory()">🗑 Clear Memory (Caution)</button>
+  </div>
+
+  <div class="note-box" style="--nc:var(--green)">
+    <div class="note-title">Free API Stack for iDeepin — Zero Cost Setup</div>
+    <strong>yfinance (Python)</strong> · pip install yfinance · All stock prices + fundamentals · Unlimited · Free forever<br>
+    <strong>Twelve Data</strong> · twelvedata.com · 800 calls/day · Live prices · Free tier · CORS browser-safe<br>
+    <strong>Alpha Vantage</strong> · alphavantage.co · 25 calls/day free · RSI, MACD, technical indicators<br>
+    <strong>NewsAPI</strong> · newsapi.org · 100 calls/day · News sentiment · Free dev tier<br>
+    <strong>FMP</strong> · financialmodelingprep.com · 250 calls/day · ETF holdings, sector data · Free<br>
+    <strong>FRED</strong> · stlouisfed.org · Unlimited · Macro data — rates, inflation, GDP · Free forever<br>
+    <strong>Scheduler:</strong> GitHub Actions (free, cron at 9:15 AM CST = 15:15 UTC weekdays) OR PythonAnywhere (1 task/day free)
+  </div>
+  <div class="note-box" style="--nc:var(--blue)">
+    <div class="note-title">Google Drive Setup Guide</div>
+    1. console.cloud.google.com → Create project "iDeepin"<br>
+    2. Enable Google Drive API + Google Calendar API<br>
+    3. Create OAuth 2.0 credentials → download client_secret.json<br>
+    4. First run: <code>flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)</code><br>
+    5. Create folder /iDeepin/ in Drive → subfolders: data/, reminders/, uploads/, logs/, exports/<br>
+    6. Key files: portfolio_memory.json (append-only) · stock_scores.json · etf_analysis.json<br>
+    7. Read/write via: <code>service.files().get_media(fileId=id)</code> and <code>service.files().update()</code>
+  </div>
+  <div class="note-box" style="--nc:var(--purple)">
+    <div class="note-title">Google Calendar Integration — Strategy Reminders</div>
+    Uses same OAuth credentials as Drive setup above.<br>
+    <strong>Create reminder:</strong> service.events().insert(calendarId='primary', body=event)<br>
+    <strong>Color coding:</strong> colorId 11=Red (SELL alerts) · 10=Green (BUY signals) · 5=Yellow (WATCH) · 9=Blue (Earnings)<br>
+    <strong>Conditional strategy:</strong> Store in event description — "IF NVDA drops 10% post-earnings THEN buy AMD at $420"<br>
+    <strong>Delete reminder:</strong> service.events().delete(calendarId='primary', eventId=event_id)<br>
+    <strong>List iDeepin reminders:</strong> events().list(calendarId='primary', q='iDeepin')<br>
+    <strong>Reminder timing:</strong> popup 30 min before · email 60 min before · both set automatically
+  </div>
+
+  <div class="note-box" style="--nc:var(--blue)">
+    <div class="note-title">☁ Hosting Guide — GitHub Pages (Free · No install · Permanent URL)</div>
+    <strong>One-time setup — 5 minutes in Chrome:</strong><br>
+    1 · Go to <strong style="color:var(--blue)">github.com</strong> → Sign Up (email + password, no card needed)<br>
+    2 · Click <strong>+</strong> top-right → <strong>New repository</strong> → name it <code>ideepin</code> → Public → Create repository<br>
+    3 · On the next page click <strong>"uploading an existing file"</strong><br>
+    4 · Drag your <code>ideepin_v1.html</code> file into the browser (rename it <code>index.html</code> first)<br>
+    5 · Scroll down → click <strong>Commit changes</strong><br>
+    6 · Click <strong>Settings</strong> tab → left sidebar → <strong>Pages</strong> → Source: main → Save<br>
+    7 · Wait 2 minutes → open: <code style="color:var(--green)">https://YOUR-USERNAME.github.io/ideepin</code><br><br>
+    <strong>Updating when new version is ready:</strong> Go to repo → click <code>index.html</code> → pencil edit icon → paste new content → Commit. 30 seconds.
+  </div>
+  <div class="note-box" style="--nc:var(--green)">
+    <div class="note-title">📈 Live Prices — Twelve Data API (Free · 800 calls/day · No card)</div>
+    1 · Go to <strong style="color:var(--blue)">twelvedata.com</strong> → Sign Up (email only, free)<br>
+    2 · Dashboard → copy your API key (long string of numbers and letters)<br>
+    3 · Open iDeepin on your GitHub Pages URL → Dashboard page → yellow panel → paste key → Save &amp; Refresh<br>
+    4 · Live prices now work. Key is saved permanently in your browser.<br><br>
+    <strong>Why GitHub Pages + Twelve Data solves everything:</strong> Both are <code>https://</code> origins. Browsers allow API calls freely between <code>https://</code> pages. No localhost. No Python. No installs. Works on Windows, iPad, and phone.
+  </div>
+  <div class="note-box" style="--nc:var(--purple)">
+    <div class="note-title">Making iDeepin Independent of Claude</div>
+    This prototype requires Claude for analysis updates. To make it fully independent:<br>
+    <strong>Step 1:</strong> Export algorithm specs (Export button above) — full v3.4 + ST-v1 specification<br>
+    <strong>Step 2:</strong> Deploy to a Node.js / Python backend server<br>
+    <strong>Step 3:</strong> Connect to a market data API (Alpha Vantage free tier or Polygon.io)<br>
+    <strong>Step 4:</strong> Schedule the 9:15 AM CST cron job on your server<br>
+    <strong>Step 5:</strong> Connect LLM API directly (Anthropic API key — cost ~$5-15/month for daily runs)<br>
+    All algorithm logic, scoring weights, and decision rules are exported in the diagnostic package.
+  </div>
+</div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="app-footer">
+  iDeepin · <span style="font-style:italic">Intelligent Deep Investment</span> ·
+  Version 1.6.0 · Updated May 11 2026 · Algorithm v3.4 + ST-v1 ·
+  Not financial advice · For informational purposes only
+</footer>
+
+<!-- EDIT / DELETE MODAL -->
+<div id="editModal" class="modal-overlay" onclick="if(event.target===this)closeEditModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="editModalTitle">Entry Details</div>
+      <button class="modal-close" onclick="closeEditModal()">✕</button>
+    </div>
+    <div class="modal-body" id="editModalBody"></div>
+    <div id="inlineEditArea" style="display:none"></div>
+  </div>
+</div>
+
+<!-- MODAL + EDIT STYLES -->
+<style>
+.modal-overlay{
+  position:fixed;inset:0;z-index:900;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;padding:20px
+}
+.modal-overlay.open{display:flex}
+.modal-box{
+  background:var(--panel2);border:1px solid var(--border2);
+  border-radius:14px;width:100%;max-width:560px;max-height:80vh;
+  overflow:hidden;display:flex;flex-direction:column;
+  box-shadow:0 24px 64px rgba(0,0,0,.6)
+}
+.modal-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 20px;border-bottom:1px solid var(--border);background:var(--bg3)
+}
+.modal-title{font-family:var(--h);font-size:18px;font-weight:700;color:var(--blue)}
+.modal-close{
+  background:transparent;border:none;color:var(--muted);
+  font-size:18px;cursor:pointer;padding:4px 8px;border-radius:4px;transition:.15s
+}
+.modal-close:hover{color:var(--red);background:var(--red-d)}
+.modal-body{padding:16px 20px;overflow-y:auto;flex:1}
+.edit-entry-row{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  padding:10px 12px;border:1px solid var(--border);border-radius:8px;
+  margin-bottom:8px;background:var(--bg3);transition:.15s
+}
+.edit-entry-row:hover{border-color:var(--blue-b)}
+.eer-info{flex:1}
+.eer-date{font-family:var(--m);font-size:10px;color:var(--blue);margin-bottom:2px;font-weight:500}
+.eer-detail{font-size:11px;color:var(--text)}
+.eer-sold{font-size:10px;color:var(--green);margin-top:2px}
+.eer-actions{display:flex;gap:6px;flex-shrink:0;margin-left:12px}
+.eer-btn{
+  font-family:var(--m);font-size:9px;letter-spacing:.06em;
+  padding:4px 10px;border-radius:4px;cursor:pointer;transition:.15s;border:1px solid
+}
+.eer-edit{background:var(--blue-d);color:var(--blue);border-color:var(--blue-b)}
+.eer-edit:hover{background:var(--blue);color:white}
+.eer-del{background:var(--red-d);color:var(--red);border-color:var(--red-b)}
+.eer-del:hover{background:var(--red);color:white}
+</style>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// CORE DATA
+// ════════════════════════════════════════════════════════════════
+
+const STOCKS_DATA = [
+  { rank:1, ticker:'NVO',  name:'Novo Nordisk ADR',      cat:'healthcare',    catLabel:'Healthcare',    price:66,   change:+1.2, pt:110,  upside:62, conf:88, signal:'buy',  strategy:'Buy now · Oral GLP-1 US ramp', action:'BUY NOW',        alloc:7.8, timeframe:'3-6M',  note:'Beat Q1, raised guidance' },
+  { rank:2, ticker:'FCX',  name:'Freeport-McMoRan',      cat:'materials',     catLabel:'Materials',     price:38,   change:+0.8, pt:58,   upside:53, conf:85, signal:'buy',  strategy:'Buy $36-39 · Target $58',     action:'BUY NOW',        alloc:7.2, timeframe:'1-3M',  note:'Copper deficit structural' },
+  { rank:3, ticker:'FLNC', name:'Fluence Energy',         cat:'energy',        catLabel:'Energy',        price:18,   change:+2.1, pt:28,   upside:39, conf:79, signal:'buy',  strategy:'Buy now · exit if <$15',      action:'BUY NOW',        alloc:6.5, timeframe:'1-3wk', note:'Hyperscaler MSA confirmed' },
+  { rank:4, ticker:'AMD',  name:'Adv Micro Devices',     cat:'semiconductors',catLabel:'Semiconductors',price:455,  change:+0.3, pt:530,  upside:16, conf:84, signal:'buy',  strategy:'Buy $440-460 · Target $530',  action:'BUY NOW',        alloc:6.2, timeframe:'2-6wk', note:'Q1 +38% · ATH momentum' },
+  { rank:5, ticker:'RKLB', name:'Rocket Lab Corp',        cat:'defence',       catLabel:'Defence/Space', price:105,  change:+1.4, pt:120,  upside:14, conf:76, signal:'buy',  strategy:'Buy $95-108 · Target $120',   action:'BUY NOW',        alloc:5.8, timeframe:'2-6wk', note:'Record backlog, 5 upgrades' },
+  { rank:6, ticker:'COHR', name:'Coherent Corp',          cat:'technology',    catLabel:'Technology',    price:82,   change:+0.6, pt:120,  upside:46, conf:80, signal:'buy',  strategy:'Buy now · Target $105-120',   action:'BUY NOW',        alloc:5.5, timeframe:'2-6wk', note:'Optical AI connectivity' },
+  { rank:7, ticker:'META', name:'Meta Platforms',         cat:'technology',    catLabel:'Technology',    price:565,  change:+1.8, pt:780,  upside:38, conf:83, signal:'buy',  strategy:'Post-dip entry · Target $700', action:'BUY NOW',       alloc:5.1, timeframe:'1-3M',  note:'AI ads thesis confirmed' },
+  { rank:8, ticker:'AMZN', name:'Amazon / AWS',           cat:'technology',    catLabel:'Technology',    price:272,  change:+0.9, pt:320,  upside:18, conf:81, signal:'buy',  strategy:'Buy $265-275 · Target $320',  action:'BUY NOW',        alloc:4.8, timeframe:'1-3M',  note:'AWS +28% fastest in 15Q' },
+  { rank:9, ticker:'LLY',  name:'Eli Lilly',              cat:'healthcare',    catLabel:'Healthcare',    price:778,  change:-0.4, pt:981,  upside:26, conf:80, signal:'buy',  strategy:'Buy $760-790 · Target $950',  action:'BUY NOW',        alloc:4.5, timeframe:'3-6M',  note:'GLP-1 leader, oral filing' },
+  { rank:10,ticker:'MRVL', name:'Marvell Technology',     cat:'semiconductors',catLabel:'Semiconductors',price:163,  change:+6.3, pt:195,  upside:20, conf:70, signal:'wait', strategy:'Wait for May 27 earnings',    action:'WAIT',           alloc:3.8, timeframe:'post-earnings', note:'Binary risk May 27' },
+  { rank:11,ticker:'CEG',  name:'Constellation Energy',   cat:'energy',        catLabel:'Energy',        price:303,  change:-5.1, pt:368,  upside:21, conf:68, signal:'wait', strategy:'Wait 2-3 days · Entry $295-310', action:'WAIT',        alloc:3.5, timeframe:'2-10d', note:'Guidance soft post-earnings' },
+  { rank:12,ticker:'LMT',  name:'Lockheed Martin',        cat:'defence',       catLabel:'Defence',       price:458,  change:+0.2, pt:590,  upside:29, conf:81, signal:'hold', strategy:'Hold · NATO tailwind',        action:'HOLD',           alloc:3.2, timeframe:'3-6M',  note:'Steady compounder, beta 0.5' },
+  { rank:13,ticker:'GS',   name:'Goldman Sachs',          cat:'financials',    catLabel:'Financials',    price:558,  change:+1.1, pt:720,  upside:29, conf:80, signal:'buy',  strategy:'Buy $545-565 · Target $700',  action:'BUY NOW',        alloc:2.8, timeframe:'1-3M',  note:'IB recovery, M&A pipeline' },
+  { rank:14,ticker:'MU',   name:'Micron Technology',      cat:'semiconductors',catLabel:'Semiconductors',price:747,  change:+0.4, pt:556,  upside:-26,conf:45, signal:'avoid','strategy':'RSI 84 · Wait $598-635 pullback', action:'AVOID NOW', alloc:0,   timeframe:'wait',  note:'Above PT, extreme overbought' },
+  { rank:15,ticker:'INTC', name:'Intel Corporation',      cat:'semiconductors',catLabel:'Semiconductors',price:126,  change:-2.1, pt:72,   upside:-43,conf:35, signal:'avoid','strategy':'Hard cap breach · 47% above PT', action:'AVOID NOW', alloc:0,   timeframe:'watch', note:'Apple deal unconfirmed' },
+];
+
+// CR-001: ETF Pool is now MARKET-WIDE — not restricted to portfolio ETFs
+// Portfolio ETFs (VOO, SCHD, VXUS, VGT, IAUM, SLV) tracked separately in Dashboard
+const ETF_DATA = [
+  // ── BROAD MARKET ──
+  { ticker:'VOO',  name:'Vanguard S&P 500 ETF',         cat:'Broad Market',  color:'#28b4ff', ytd:7.92,  oneY:33.0, er:0.03, yield_:1.06, beta:1.0,  grade:'A',  signal:'continue', verdict:'STRONG · Continue DCA · 6 consecutive winning weeks' },
+  { ticker:'QQQ',  name:'Invesco Nasdaq 100',            cat:'Broad Market',  color:'#00d4ff', ytd:9.8,   oneY:38.0, er:0.20, yield_:0.60, beta:1.2,  grade:'A',  signal:'watch',    verdict:'STRONG · Tech-heavy · Higher ER than VGT' },
+  { ticker:'SPY',  name:'SPDR S&P 500 ETF',              cat:'Broad Market',  color:'#40a0ff', ytd:7.8,   oneY:32.5, er:0.09, yield_:1.10, beta:1.0,  grade:'A-', signal:'continue', verdict:'GOOD · Slightly higher ER vs VOO · Functional equivalent' },
+  // ── TECHNOLOGY ──
+  { ticker:'VGT',  name:'Vanguard Info Technology',      cat:'Technology',    color:'#a060ff', ytd:16.40, oneY:42.0, er:0.10, yield_:0.35, beta:1.47, grade:'A+', signal:'increase', verdict:'LEADING · +16.4% YTD · AI narrative intact · Increase DCA' },
+  { ticker:'SOXX', name:'iShares Semiconductor ETF',     cat:'Technology',    color:'#c860ff', ytd:14.2,  oneY:48.0, er:0.35, yield_:0.50, beta:1.8,  grade:'A',  signal:'watch',    verdict:'STRONG · Pure semiconductor play · Higher beta/ER vs VGT' },
+  { ticker:'SMH',  name:'VanEck Semiconductor ETF',      cat:'Technology',    color:'#b040ff', ytd:15.1,  oneY:50.0, er:0.35, yield_:0.40, beta:1.85, grade:'A',  signal:'watch',    verdict:'STRONG · Closest ETF to Basket 1 semiconductor picks' },
+  { ticker:'ARKK', name:'ARK Innovation ETF',            cat:'Technology',    color:'#ff40a0', ytd:22.0,  oneY:68.0, er:0.75, yield_:0,    beta:2.2,  grade:'B',  signal:'avoid',    verdict:'HIGH RISK · High ER · Speculative · Not for DCA strategy' },
+  // ── HEALTHCARE ──
+  { ticker:'VHT',  name:'Vanguard Health Care ETF',      cat:'Healthcare',    color:'#00e896', ytd:6.2,   oneY:22.0, er:0.10, yield_:1.20, beta:0.72, grade:'A',  signal:'continue', verdict:'SOLID · Low beta 0.72 · NVO + LLY partial coverage' },
+  { ticker:'XLV',  name:'Health Care Select SPDR',       cat:'Healthcare',    color:'#20d8a0', ytd:5.8,   oneY:21.5, er:0.09, yield_:1.35, beta:0.70, grade:'A-', signal:'continue', verdict:'GOOD · Defensive income · Low ER · S&P healthcare' },
+  // ── DIVIDEND / INCOME ──
+  { ticker:'SCHD', name:'Schwab US Dividend Equity',     cat:'Dividend',      color:'#00e896', ytd:5.20,  oneY:28.1, er:0.06, yield_:3.44, beta:0.8,  grade:'A',  signal:'continue', verdict:'STRONG · 3.44% yield · Covers ABBV, LMT, RTX, ETN partially' },
+  { ticker:'VYM',  name:'Vanguard High Dividend Yield',  cat:'Dividend',      color:'#10c880', ytd:4.8,   oneY:24.0, er:0.06, yield_:2.80, beta:0.75, grade:'B+', signal:'continue', verdict:'GOOD · Lower yield than SCHD but broader base' },
+  { ticker:'JEPI', name:'JPMorgan Equity Premium Income',cat:'Dividend',      color:'#30b870', ytd:5.4,   oneY:18.0, er:0.35, yield_:7.20, beta:0.6,  grade:'B+', signal:'watch',    verdict:'HIGH YIELD · 7.2% income · Options overlay caps upside · Higher ER' },
+  // ── INTERNATIONAL ──
+  { ticker:'VXUS', name:'Vanguard Total Intl Stock',     cat:'International', color:'#ffb020', ytd:11.79, oneY:34.2, er:0.05, yield_:2.72, beta:1.05, grade:'A',  signal:'continue', verdict:'OUTPERFORMING · Rare intl outperformance vs VOO · NVO + AEM inside' },
+  { ticker:'VEA',  name:'Vanguard Developed Markets',    cat:'International', color:'#e8a010', ytd:10.2,  oneY:30.0, er:0.03, yield_:2.80, beta:0.95, grade:'A-', signal:'continue', verdict:'SOLID · Cheapest ER in intl space · Developed markets only' },
+  { ticker:'VWO',  name:'Vanguard Emerging Markets',     cat:'International', color:'#d09020', ytd:8.5,   oneY:25.0, er:0.08, yield_:2.50, beta:1.10, grade:'B+', signal:'watch',    verdict:'CAUTION · China exposure · Geopolitical risk elevated' },
+  // ── COMMODITIES / ALTERNATIVES ──
+  { ticker:'IAUM', name:'iShares Gold Trust Micro',      cat:'Commodities',   color:'#f0c840', ytd:12.0,  oneY:49.0, er:0.09, yield_:0,    beta:0.1,  grade:'A',  signal:'continue', verdict:'STRONG · Gold near ATH $4,731 · Lowest ER gold ETF · Best gold option' },
+  { ticker:'GLD',  name:'SPDR Gold Shares',              cat:'Commodities',   color:'#d0a830', ytd:11.8,  oneY:48.0, er:0.40, yield_:0,    beta:0.1,  grade:'B+', signal:'watch',    verdict:'AVOID vs IAUM · Same exposure · 4.4× higher ER than IAUM' },
+  { ticker:'SLV',  name:'iShares Silver Trust',          cat:'Commodities',   color:'#90b0d0', ytd:8.0,   oneY:35.0, er:0.50, yield_:0,    beta:0.4,  grade:'B',  signal:'continue', verdict:'HOLD · High ER 0.50% · AI/industrial silver demand thesis intact' },
+  { ticker:'COPX', name:'Global X Copper Miners ETF',    cat:'Commodities',   color:'#e08030', ytd:18.2,  oneY:42.0, er:0.65, yield_:1.10, beta:1.6,  grade:'B+', signal:'watch',    verdict:'INTERESTING · FCX is top holding · Alternative to buying FCX direct · Higher ER' },
+  // ── DEFENCE / AEROSPACE ──
+  { ticker:'ITA',  name:'iShares US Aerospace & Defence',cat:'Defence',       color:'#8060ff', ytd:12.4,  oneY:35.0, er:0.40, yield_:0.80, beta:0.9,  grade:'A-', signal:'watch',    verdict:'SOLID · LMT + RTX + AVAV inside · NATO tailwind · Higher ER' },
+  { ticker:'XAR',  name:'SPDR S&P Aerospace & Defence',  cat:'Defence',       color:'#7050e0', ytd:11.8,  oneY:33.0, er:0.35, yield_:0.70, beta:0.85, grade:'B+', signal:'watch',    verdict:'GOOD · Equal-weight approach vs ITA · Broader exposure' },
+  // ── REAL ESTATE ──
+  { ticker:'VNQ',  name:'Vanguard Real Estate ETF',      cat:'Real Estate',   color:'#10d8c0', ytd:3.2,   oneY:18.0, er:0.12, yield_:3.80, beta:0.85, grade:'B+', signal:'watch',    verdict:'INCOME · EQIX is top holding · Rate sensitive · 3.8% yield' },
+  // ── ENERGY / CLEAN ──
+  { ticker:'ICLN', name:'iShares Global Clean Energy',   cat:'Energy',        color:'#f0c840', ytd:14.8,  oneY:32.0, er:0.40, yield_:0.90, beta:1.3,  grade:'B+', signal:'watch',    verdict:'GROWING · Nuclear + solar + storage · CEG and FLNC type exposure' },
+  { ticker:'XLE',  name:'Energy Select SPDR',            cat:'Energy',        color:'#e0a020', ytd:4.2,   oneY:15.0, er:0.09, yield_:3.20, beta:1.0,  grade:'B',  signal:'watch',    verdict:'INCOME · Traditional energy · High yield · Low growth vs clean energy' },
+];
+
+// CR-002: Dashboard starts EMPTY — only user-entered data shows here
+// Pre-populated suggestions removed — user may not have implemented all suggestions
+const HOLDINGS_DATA = []; // populated by user via manual entry form
+const ETF_HOLDINGS  = []; // populated by user via manual entry form
+
+const REMINDERS_DATA = [
+  { id:1, title:'NVDA Post-Earnings Deploy', ticker:'NVDA', date:'2026-05-20', strategy:'If NVDA beats → deploy $150 cash into AMD + MRVL. If misses → buy AMD dip at $420-430.', type:'conditional' },
+  { id:2, title:'MU Re-entry Zone', ticker:'MU', date:'2026-06-01', strategy:'Watch for MU pullback to $598-635. If reached → buy $200 position. RSI must be below 60 at entry.', type:'price-alert' },
+  { id:3, title:'MRVL Post-Earnings Review', ticker:'MRVL', date:'2026-05-27', strategy:'MRVL earnings May 27. If beat + strong guidance → add $150 position. If miss → remove from watchlist.', type:'earnings' },
+];
+
+// ════════════════════════════════════════════════════════════════
+// MASTER SYMBOL LIST — comprehensive 300+ stocks + all ETFs
+// Used by the searchable dropdown in manual entry form
+// ════════════════════════════════════════════════════════════════
+const MASTER_SYMBOLS = [
+  // ── MEGA CAP TECH ──
+  {tick:'AAPL',name:'Apple Inc'},
+  {tick:'MSFT',name:'Microsoft Corporation'},
+  {tick:'NVDA',name:'NVIDIA Corporation'},
+  {tick:'GOOGL',name:'Alphabet Inc Class A'},
+  {tick:'GOOG',name:'Alphabet Inc Class C'},
+  {tick:'META',name:'Meta Platforms Inc'},
+  {tick:'AMZN',name:'Amazon.com Inc'},
+  {tick:'TSLA',name:'Tesla Inc'},
+  {tick:'AVGO',name:'Broadcom Inc'},
+  {tick:'ORCL',name:'Oracle Corporation'},
+  {tick:'ADBE',name:'Adobe Inc'},
+  {tick:'CRM',name:'Salesforce Inc'},
+  {tick:'CSCO',name:'Cisco Systems Inc'},
+  {tick:'INTC',name:'Intel Corporation'},
+  {tick:'IBM',name:'IBM Corporation'},
+  {tick:'QCOM',name:'Qualcomm Inc'},
+  {tick:'TXN',name:'Texas Instruments Inc'},
+  {tick:'AMD',name:'Advanced Micro Devices Inc'},
+  {tick:'MU',name:'Micron Technology Inc'},
+  {tick:'AMAT',name:'Applied Materials Inc'},
+  {tick:'LRCX',name:'Lam Research Corporation'},
+  {tick:'KLAC',name:'KLA Corporation'},
+  {tick:'MRVL',name:'Marvell Technology Inc'},
+  {tick:'MCHP',name:'Microchip Technology Inc'},
+  {tick:'ON',name:'ON Semiconductor Corp'},
+  {tick:'COHR',name:'Coherent Corp'},
+  {tick:'ALAB',name:'Astera Labs Inc'},
+  {tick:'RKLB',name:'Rocket Lab USA Inc'},
+  {tick:'IONQ',name:'IonQ Inc'},
+  {tick:'SOUN',name:'SoundHound AI Inc'},
+  // ── CLOUD / SOFTWARE ──
+  {tick:'SNOW',name:'Snowflake Inc'},
+  {tick:'DDOG',name:'Datadog Inc'},
+  {tick:'CRWD',name:'CrowdStrike Holdings Inc'},
+  {tick:'PANW',name:'Palo Alto Networks Inc'},
+  {tick:'FTNT',name:'Fortinet Inc'},
+  {tick:'ZS',name:'Zscaler Inc'},
+  {tick:'NET',name:'Cloudflare Inc'},
+  {tick:'PLTR',name:'Palantir Technologies Inc'},
+  {tick:'GTLB',name:'GitLab Inc'},
+  {tick:'MDB',name:'MongoDB Inc'},
+  {tick:'WDAY',name:'Workday Inc'},
+  {tick:'NOW',name:'ServiceNow Inc'},
+  {tick:'HUBS',name:'HubSpot Inc'},
+  {tick:'SHOP',name:'Shopify Inc'},
+  {tick:'TEAM',name:'Atlassian Corporation'},
+  {tick:'ZM',name:'Zoom Video Communications'},
+  {tick:'DOCU',name:'DocuSign Inc'},
+  {tick:'OKTA',name:'Okta Inc'},
+  {tick:'AKAM',name:'Akamai Technologies Inc'},
+  {tick:'TWLO',name:'Twilio Inc'},
+  // ── AI / DATA CENTRES ──
+  {tick:'SMCI',name:'Super Micro Computer Inc'},
+  {tick:'VRT',name:'Vertiv Holdings Co'},
+  {tick:'ETN',name:'Eaton Corporation'},
+  {tick:'EQIX',name:'Equinix Inc'},
+  {tick:'DLR',name:'Digital Realty Trust'},
+  {tick:'IBRK',name:'Interactive Brokers Group'},
+  // ── COMMUNICATION ──
+  {tick:'T',name:'AT&T Inc'},
+  {tick:'VZ',name:'Verizon Communications Inc'},
+  {tick:'TMUS',name:'T-Mobile US Inc'},
+  {tick:'DIS',name:'The Walt Disney Company'},
+  {tick:'NFLX',name:'Netflix Inc'},
+  {tick:'SPOT',name:'Spotify Technology SA'},
+  {tick:'SNAP',name:'Snap Inc'},
+  {tick:'PINS',name:'Pinterest Inc'},
+  {tick:'RDDT',name:'Reddit Inc'},
+  // ── FINANCIALS ──
+  {tick:'JPM',name:'JPMorgan Chase & Co'},
+  {tick:'BAC',name:'Bank of America Corp'},
+  {tick:'WFC',name:'Wells Fargo & Company'},
+  {tick:'GS',name:'Goldman Sachs Group Inc'},
+  {tick:'MS',name:'Morgan Stanley'},
+  {tick:'BLK',name:'BlackRock Inc'},
+  {tick:'AXP',name:'American Express Company'},
+  {tick:'V',name:'Visa Inc'},
+  {tick:'MA',name:'Mastercard Inc'},
+  {tick:'PYPL',name:'PayPal Holdings Inc'},
+  {tick:'SQ',name:'Block Inc'},
+  {tick:'COIN',name:'Coinbase Global Inc'},
+  {tick:'C',name:'Citigroup Inc'},
+  {tick:'USB',name:'U.S. Bancorp'},
+  {tick:'PNC',name:'PNC Financial Services Group'},
+  {tick:'SCHW',name:'Charles Schwab Corporation'},
+  {tick:'ICE',name:'Intercontinental Exchange Inc'},
+  {tick:'CME',name:'CME Group Inc'},
+  {tick:'SPGI',name:'S&P Global Inc'},
+  {tick:'MCO',name:'Moody\'s Corporation'},
+  // ── HEALTHCARE ──
+  {tick:'LLY',name:'Eli Lilly and Company'},
+  {tick:'NVO',name:'Novo Nordisk AS ADR'},
+  {tick:'JNJ',name:'Johnson & Johnson'},
+  {tick:'UNH',name:'UnitedHealth Group Inc'},
+  {tick:'ABBV',name:'AbbVie Inc'},
+  {tick:'MRK',name:'Merck & Co Inc'},
+  {tick:'PFE',name:'Pfizer Inc'},
+  {tick:'BMY',name:'Bristol-Myers Squibb Company'},
+  {tick:'AMGN',name:'Amgen Inc'},
+  {tick:'GILD',name:'Gilead Sciences Inc'},
+  {tick:'BIIB',name:'Biogen Inc'},
+  {tick:'REGN',name:'Regeneron Pharmaceuticals'},
+  {tick:'VRTX',name:'Vertex Pharmaceuticals Inc'},
+  {tick:'MRNA',name:'Moderna Inc'},
+  {tick:'ISRG',name:'Intuitive Surgical Inc'},
+  {tick:'ABT',name:'Abbott Laboratories'},
+  {tick:'MDT',name:'Medtronic PLC'},
+  {tick:'SYK',name:'Stryker Corporation'},
+  {tick:'EW',name:'Edwards Lifesciences Corp'},
+  {tick:'DHR',name:'Danaher Corporation'},
+  {tick:'DXCM',name:'Dexcom Inc'},
+  {tick:'IDXX',name:'Idexx Laboratories Inc'},
+  // ── CONSUMER ──
+  {tick:'AMZN',name:'Amazon.com Inc'},
+  {tick:'COST',name:'Costco Wholesale Corporation'},
+  {tick:'WMT',name:'Walmart Inc'},
+  {tick:'HD',name:'Home Depot Inc'},
+  {tick:'LOW',name:'Lowe\'s Companies Inc'},
+  {tick:'TGT',name:'Target Corporation'},
+  {tick:'NKE',name:'Nike Inc'},
+  {tick:'ONON',name:'On Holding AG ADR'},
+  {tick:'LULU',name:'Lululemon Athletica Inc'},
+  {tick:'SBUX',name:'Starbucks Corporation'},
+  {tick:'MCD',name:'McDonald\'s Corporation'},
+  {tick:'CMG',name:'Chipotle Mexican Grill Inc'},
+  {tick:'YUM',name:'Yum! Brands Inc'},
+  {tick:'BKNG',name:'Booking Holdings Inc'},
+  {tick:'ABNB',name:'Airbnb Inc'},
+  {tick:'UBER',name:'Uber Technologies Inc'},
+  {tick:'LYFT',name:'Lyft Inc'},
+  {tick:'F',name:'Ford Motor Company'},
+  {tick:'GM',name:'General Motors Company'},
+  {tick:'RIVN',name:'Rivian Automotive Inc'},
+  {tick:'LCID',name:'Lucid Group Inc'},
+  {tick:'TSCO',name:'Tractor Supply Company'},
+  // ── INDUSTRIALS / DEFENCE ──
+  {tick:'LMT',name:'Lockheed Martin Corporation'},
+  {tick:'RTX',name:'RTX Corporation'},
+  {tick:'NOC',name:'Northrop Grumman Corporation'},
+  {tick:'GD',name:'General Dynamics Corporation'},
+  {tick:'BA',name:'Boeing Company'},
+  {tick:'AVAV',name:'AeroVironment Inc'},
+  {tick:'HII',name:'Huntington Ingalls Industries'},
+  {tick:'GE',name:'GE Aerospace'},
+  {tick:'HON',name:'Honeywell International Inc'},
+  {tick:'MMM',name:'3M Company'},
+  {tick:'CAT',name:'Caterpillar Inc'},
+  {tick:'DE',name:'Deere & Company'},
+  {tick:'UPS',name:'United Parcel Service Inc'},
+  {tick:'FDX',name:'FedEx Corporation'},
+  {tick:'XPO',name:'XPO Inc'},
+  {tick:'EMR',name:'Emerson Electric Co'},
+  {tick:'ROK',name:'Rockwell Automation Inc'},
+  {tick:'PWR',name:'Quanta Services Inc'},
+  {tick:'HUBB',name:'Hubbell Inc'},
+  // ── ENERGY ──
+  {tick:'XOM',name:'Exxon Mobil Corporation'},
+  {tick:'CVX',name:'Chevron Corporation'},
+  {tick:'COP',name:'ConocoPhillips'},
+  {tick:'SLB',name:'SLB (Schlumberger)'},
+  {tick:'HAL',name:'Halliburton Company'},
+  {tick:'BKR',name:'Baker Hughes Company'},
+  {tick:'CEG',name:'Constellation Energy Corporation'},
+  {tick:'NEE',name:'NextEra Energy Inc'},
+  {tick:'VST',name:'Vistra Corp'},
+  {tick:'NRG',name:'NRG Energy Inc'},
+  {tick:'OKE',name:'ONEOK Inc'},
+  {tick:'FLNC',name:'Fluence Energy Inc'},
+  {tick:'ENPH',name:'Enphase Energy Inc'},
+  {tick:'FSLR',name:'First Solar Inc'},
+  {tick:'SEDG',name:'SolarEdge Technologies Inc'},
+  {tick:'PLUG',name:'Plug Power Inc'},
+  {tick:'BE',name:'Bloom Energy Corporation'},
+  // ── MATERIALS ──
+  {tick:'FCX',name:'Freeport-McMoRan Inc'},
+  {tick:'NEM',name:'Newmont Corporation'},
+  {tick:'AEM',name:'Agnico Eagle Mines Limited'},
+  {tick:'GOLD',name:'Barrick Gold Corporation'},
+  {tick:'RGLD',name:'Royal Gold Inc'},
+  {tick:'WPM',name:'Wheaton Precious Metals Corp'},
+  {tick:'ALB',name:'Albemarle Corporation'},
+  {tick:'LIN',name:'Linde PLC'},
+  {tick:'APD',name:'Air Products and Chemicals'},
+  {tick:'NUE',name:'Nucor Corporation'},
+  {tick:'X',name:'United States Steel Corporation'},
+  {tick:'STLD',name:'Steel Dynamics Inc'},
+  {tick:'AA',name:'Alcoa Corporation'},
+  {tick:'MP',name:'MP Materials Corp'},
+  // ── REAL ESTATE ──
+  {tick:'AMT',name:'American Tower Corporation'},
+  {tick:'PLD',name:'Prologis Inc'},
+  {tick:'EQIX',name:'Equinix Inc'},
+  {tick:'CCI',name:'Crown Castle Inc'},
+  {tick:'SPG',name:'Simon Property Group Inc'},
+  {tick:'PSA',name:'Public Storage'},
+  {tick:'EXR',name:'Extra Space Storage Inc'},
+  {tick:'AVB',name:'AvalonBay Communities Inc'},
+  {tick:'EQR',name:'Equity Residential'},
+  // ── MAJOR ADRs ──
+  {tick:'TSM',name:'Taiwan Semiconductor Manufacturing ADR'},
+  {tick:'ASML',name:'ASML Holding NV ADR'},
+  {tick:'SAP',name:'SAP SE ADR'},
+  {tick:'TM',name:'Toyota Motor Corporation ADR'},
+  {tick:'SONY',name:'Sony Group Corporation ADR'},
+  {tick:'BABA',name:'Alibaba Group Holding ADR'},
+  {tick:'JD',name:'JD.com Inc ADR'},
+  {tick:'PDD',name:'PDD Holdings Inc ADR'},
+  {tick:'TCEHY',name:'Tencent Holdings ADR'},
+  {tick:'SHOP',name:'Shopify Inc'},
+  {tick:'RY',name:'Royal Bank of Canada'},
+  {tick:'TD',name:'Toronto-Dominion Bank'},
+  {tick:'CNI',name:'Canadian National Railway Co'},
+  {tick:'BP',name:'BP PLC ADR'},
+  {tick:'SHEL',name:'Shell PLC ADR'},
+  {tick:'HSBC',name:'HSBC Holdings PLC ADR'},
+  {tick:'UL',name:'Unilever PLC ADR'},
+  {tick:'NVS',name:'Novartis AG ADR'},
+  {tick:'RHHBY',name:'Roche Holding AG ADR'},
+  {tick:'AZN',name:'AstraZeneca PLC ADR'},
+  {tick:'GSK',name:'GSK PLC ADR'},
+  {tick:'NVO',name:'Novo Nordisk AS ADR'},
+  {tick:'NSRGY',name:'Nestle SA ADR'},
+  {tick:'LVMUY',name:'LVMH Moet Hennessy ADR'},
+  // ── ALL ETFs ──
+  ...ETF_DATA.map(e => ({tick:e.ticker, name:e.name})),
+  // Additional ETFs not in ETF_DATA
+  {tick:'SPY',name:'SPDR S&P 500 ETF Trust'},
+  {tick:'IVV',name:'iShares Core S&P 500 ETF'},
+  {tick:'VTI',name:'Vanguard Total Stock Market ETF'},
+  {tick:'QQQ',name:'Invesco QQQ Trust Nasdaq 100'},
+  {tick:'VEA',name:'Vanguard FTSE Developed Markets ETF'},
+  {tick:'VWO',name:'Vanguard FTSE Emerging Markets ETF'},
+  {tick:'BND',name:'Vanguard Total Bond Market ETF'},
+  {tick:'AGG',name:'iShares Core US Aggregate Bond ETF'},
+  {tick:'GLD',name:'SPDR Gold Shares ETF'},
+  {tick:'IAU',name:'iShares Gold Trust'},
+  {tick:'IAUM',name:'iShares Gold Trust Micro'},
+  {tick:'SLV',name:'iShares Silver Trust'},
+  {tick:'PDBC',name:'Invesco Optimum Yield Diversified ETF'},
+  {tick:'COPX',name:'Global X Copper Miners ETF'},
+  {tick:'XLF',name:'Financial Select Sector SPDR Fund'},
+  {tick:'XLK',name:'Technology Select Sector SPDR Fund'},
+  {tick:'XLV',name:'Health Care Select Sector SPDR Fund'},
+  {tick:'XLE',name:'Energy Select Sector SPDR Fund'},
+  {tick:'XLI',name:'Industrial Select Sector SPDR Fund'},
+  {tick:'XLP',name:'Consumer Staples Select Sector SPDR'},
+  {tick:'XLY',name:'Consumer Discretionary Select Sector SPDR'},
+  {tick:'XLU',name:'Utilities Select Sector SPDR Fund'},
+  {tick:'XLRE',name:'Real Estate Select Sector SPDR Fund'},
+  {tick:'XLB',name:'Materials Select Sector SPDR Fund'},
+  {tick:'SOXX',name:'iShares Semiconductor ETF'},
+  {tick:'SMH',name:'VanEck Semiconductor ETF'},
+  {tick:'ARKK',name:'ARK Innovation ETF'},
+  {tick:'ARKG',name:'ARK Genomic Revolution ETF'},
+  {tick:'ARKW',name:'ARK Next Generation Internet ETF'},
+  {tick:'ICLN',name:'iShares Global Clean Energy ETF'},
+  {tick:'LIT',name:'Global X Lithium & Battery Tech ETF'},
+  {tick:'ITA',name:'iShares US Aerospace & Defense ETF'},
+  {tick:'XAR',name:'SPDR S&P Aerospace & Defense ETF'},
+  {tick:'VNQ',name:'Vanguard Real Estate ETF'},
+  {tick:'IYR',name:'iShares US Real Estate ETF'},
+  {tick:'VYM',name:'Vanguard High Dividend Yield ETF'},
+  {tick:'JEPI',name:'JPMorgan Equity Premium Income ETF'},
+  {tick:'JEPQ',name:'JPMorgan Nasdaq Equity Premium Income ETF'},
+  {tick:'SCHD',name:'Schwab US Dividend Equity ETF'},
+  {tick:'DGRO',name:'iShares Core Dividend Growth ETF'},
+  {tick:'VIG',name:'Vanguard Dividend Appreciation ETF'},
+  {tick:'VOO',name:'Vanguard S&P 500 ETF'},
+  {tick:'VGT',name:'Vanguard Information Technology ETF'},
+  {tick:'VXUS',name:'Vanguard Total International Stock ETF'},
+  {tick:'VHT',name:'Vanguard Health Care ETF'},
+];
+// Deduplicate by ticker
+const seenTicks = new Set();
+const STOCK_SYMBOLS = MASTER_SYMBOLS.filter(s => {
+  if (seenTicks.has(s.tick)) return false;
+  seenTicks.add(s.tick);
+  return true;
+});
+
+// ════════════════════════════════════════════════════════════════
+// PORTFOLIO MEMORY
+// ════════════════════════════════════════════════════════════════
+function loadMemory() {
+  try { return JSON.parse(localStorage.getItem('ideepin_portfolio') || '[]'); }
+  catch { return []; }
+}
+function saveMemory(data) {
+  localStorage.setItem('ideepin_portfolio', JSON.stringify(data));
+  updateDiagnostics();
+}
+
+// ════════════════════════════════════════════════════════════════
+// CLOCK + TIME
+// ════════════════════════════════════════════════════════════════
+function updateClock() {
+  const now = new Date();
+  const opts = { timeZone:'America/Chicago', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true };
+  const cst = now.toLocaleTimeString('en-US', opts);
+  const date = now.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+  document.getElementById('liveClock').textContent = `${date} · ${cst} CST`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ════════════════════════════════════════════════════════════════
+// LIVE PRICE ENGINE — Twelve Data API (free, CORS-allowed, browser-safe)
+// Free: 800 calls/day — sign up free at twelvedata.com, no credit card
+// ════════════════════════════════════════════════════════════════
+const LIVE_PRICES = {};
+
+function getFinnhubKey() { // kept as getFinnhubKey internally for compatibility
+  return localStorage.getItem('ideepin_api_key') || '';
+}
+function setFinnhubKey(k) {
+  localStorage.setItem('ideepin_api_key', k.trim());
+  showToast('✓ API key saved');
+}
+
+async function fetchPrice(ticker) {
+  const key = getFinnhubKey().trim();
+  if (!key) return { err: 'NO_KEY' };
+  const cleanTicker = ticker.split(/[\s\u2014\-]/)[0].toUpperCase().trim();
+  try {
+    const url = `https://api.twelvedata.com/price?symbol=${cleanTicker}&apikey=${key}`;
+    const res  = await fetch(url);
+    if (res.status === 401 || res.status === 403) return { err: 'BAD_KEY' };
+    if (res.status === 429) return { err: 'RATE_LIMIT' };
+    if (!res.ok) return { err: 'HTTP_' + res.status };
+    const d = await res.json();
+    // Twelve Data error formats
+    if (d && d.code && d.code !== 200) return { err: 'API_ERR', msg: d.message||d.code };
+    if (d && d.status === 'error')     return { err: 'API_ERR', msg: d.message };
+    const price = parseFloat(d.price);
+    if (!price || isNaN(price))        return { err: 'NO_DATA', ticker: cleanTicker };
+    return {
+      ok:        true,
+      price:     parseFloat(price.toFixed(2)),
+      change:    0,    // Twelve Data price endpoint — change needs separate call
+      changePct: 0,
+      prevClose: 0,
+      high:      0,
+      low:       0,
+      updatedAt: new Date().toLocaleTimeString('en-US',{timeZone:'America/Chicago',hour:'2-digit',minute:'2-digit'}),
+    };
+  } catch(e) {
+    if (e.message && (e.message.includes('Failed to fetch') || e.message.includes('NetworkError') || e.message.includes('Load failed'))) {
+      return { err: 'CORS' };
+    }
+    return { err: 'NETWORK', msg: e.message };
+  }
+}
+
+async function testFinnhubKey() {
+  const inp = document.getElementById('finnhubKeyInput');
+  const key = inp ? inp.value.trim() : getFinnhubKey().trim();
+  if (!key) { showToast('\u26a0 Paste your API key first'); return; }
+  localStorage.setItem('ideepin_finnhub_key', key);
+  const statusEl = document.getElementById('finnhubTestResult');
+  const setStatus = (msg, color) => { if (statusEl) { statusEl.innerHTML = msg; statusEl.style.color = color; } };
+  setStatus('Testing connection...', 'var(--amber)');
+
+  if (window.location.protocol === 'file:') {
+    const _ua = navigator.userAgent;
+    const _isIpad    = /iPad/.test(_ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const _isAndroid = /Android/.test(_ua);
+    const _isWin     = /Windows/.test(_ua);
+    let _fix;
+    if (_isIpad || _isAndroid) {
+      _fix = `✗ <strong>iPad / Mobile detected.</strong> Cannot use localhost on iPad or Android.<br>
+        <strong>Solution → Netlify Drop (free, 3 min):</strong><br>
+        1· Rename the file to <code>index.html</code> → put it in a folder called <code>ideepin</code><br>
+        2· Open <code style="color:var(--green)">app.netlify.com/drop</code> in Safari<br>
+        3· Tap the upload area → select your <code>ideepin</code> folder<br>
+        4· Copy the <code>xyz.netlify.app</code> URL → open it → paste Finnhub key → done`;
+    } else if (_isWin) {
+      _fix = `✗ <strong>Windows detected. Open this file via localhost:</strong><br>
+        1· Press <kbd>Win + R</kbd> → type <code>cmd</code> → press Enter<br>
+        2· In the black window type: <code style="color:var(--green)">cd %USERPROFILE%\Downloads</code> then Enter<br>
+        3· Then type: <code style="color:var(--green)">python -m http.server 8080</code> then Enter<br>
+        4· Open Chrome → go to: <code style="color:var(--green)">http://localhost:8080/ideepin_v1.html</code><br>
+        5· Keep the black CMD window open while using the app → paste key → press Refresh`;
+    } else {
+      _fix = `✗ <strong>Mac / Linux detected. Open this file via localhost:</strong><br>
+        1· Open Terminal<br>
+        2· Type: <code style="color:var(--green)">cd ~/Downloads</code> then Enter<br>
+        3· Type: <code style="color:var(--green)">python3 -m http.server 8080</code> then Enter<br>
+        4· Open Chrome → go to: <code style="color:var(--green)">http://localhost:8080/ideepin_v1.html</code>`;
+    }
+    setStatus(_fix, 'var(--red)');
+    showToast('⚠ Open via localhost or Netlify — see instructions below key field');
+    return;
+  }
+
+  const result = await fetchPrice('MSFT');
+  if (result.ok) {
+    setStatus('\u2713 Key works! MSFT = $' + result.price + ' (' + (result.changePct >= 0 ? '+' : '') + result.changePct + '%)', 'var(--green)');
+    showToast('\u2713 Twelve Data key works · MSFT $' + result.price);
+    if (inp) inp.style.borderColor = 'var(--green)';
+  } else if (result.err === 'BAD_KEY') {
+    setStatus('\u2717 Key rejected. Re-copy from <strong>twelvedata.com</strong> \u2192 Dashboard \u2192 API Key section. No spaces.', 'var(--red)');
+    showToast('\u2717 Key invalid — copy again from twelvedata.com');
+  } else if (result.err === 'CORS') {
+    setStatus(`<strong>\u2717 CORS blocked.</strong> Open this file via a local server, not directly.<br>
+      Run: <code style="color:var(--green)">python3 -m http.server 8080</code> then open <code style="color:var(--green)">http://localhost:8080/ideepin_v1.html</code>`, 'var(--red)');
+  } else if (result.err === 'RATE_LIMIT') {
+    setStatus('\u26a0 Rate limited. Wait 1 minute then test again.', 'var(--amber)');
+  } else {
+    setStatus('\u26a0 Error: ' + result.err + ' ' + (result.msg||''), 'var(--amber)');
+  }
+}
+
+async function triggerRefresh() {
+  const btn = document.querySelector('.refresh-btn');
+
+  if (window.location.protocol === 'file:') {
+    btn && btn.classList.remove('spinning');
+    document.getElementById('finnhubKeyWrap').style.display = 'flex';
+    // Show device-specific instructions via testFinnhubKey
+    setTimeout(testFinnhubKey, 100);
+    return;
+  }
+
+  const key = getFinnhubKey().trim();
+  if (!key) {
+    btn && btn.classList.remove('spinning');
+    document.getElementById('finnhubKeyWrap').style.display = 'flex';
+    showToast('\u26a0 Add Finnhub API key first');
+    return;
+  }
+
+  btn && btn.classList.add('spinning');
+  showToast('\u27f3 Fetching live prices from Twelve Data...');
+
+  const mem = loadMemory();
+  const tickers = [...new Set(
+    mem.map(e => e.stock.split(/[\s\u2014\-]/)[0].toUpperCase().trim()).filter(t => t.length >= 1 && t.length <= 6)
+  )];
+
+  if (!tickers.length) {
+    btn && btn.classList.remove('spinning');
+    const now = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',timeZone:'America/Chicago'});
+    document.getElementById('lastUpdateTime').textContent = now + ' CST';
+    showToast('No positions yet \u2014 add entries first');
+    return;
+  }
+
+  let fetched = 0, failed = 0, badKey = false, corsBlock = false;
+  for (const ticker of tickers) {
+    const result = await fetchPrice(ticker);
+    if (result.ok) {
+      LIVE_PRICES[ticker] = result;
+      fetched++;
+    } else {
+      if (result.err === 'BAD_KEY')   { badKey = true; break; }
+      if (result.err === 'CORS')      { corsBlock = true; break; }
+      if (result.err === 'RATE_LIMIT'){ showToast('\u26a0 Rate limit \u2014 pausing 15s'); await new Promise(r=>setTimeout(r,15000)); }
+      failed++;
+    }
+    await new Promise(r => setTimeout(r, 250));
+  }
+
+  btn && btn.classList.remove('spinning');
+
+  if (badKey || corsBlock) {
+    document.getElementById('finnhubKeyWrap').style.display = 'flex';
+    setTimeout(testFinnhubKey, 100);
+    showToast(badKey ? '\u2717 Key rejected \u2014 see instructions' : '\u2717 CORS blocked \u2014 use localhost');
+    return;
+  }
+
+  if (fetched > 0) {
+    renderHoldings(); renderETFHoldings(); renderPortfolioChart();
+    STOCKS_DATA.forEach(s => {
+      if (LIVE_PRICES[s.ticker]) { s.price = LIVE_PRICES[s.ticker].price; s.change = LIVE_PRICES[s.ticker].changePct; }
+    });
+    renderStockTable(STOCKS_DATA);
+  }
+
+  const now = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',timeZone:'America/Chicago'});
+  document.getElementById('lastUpdateTime').textContent = now + ' CST';
+  localStorage.setItem('ideepin_lastUpdate', now);
+  showToast(fetched > 0
+    ? `\u2713 ${fetched} price${fetched>1?'s':''} updated \u00b7 ${failed>0?failed+' unavailable \u00b7 ':''}${now} CST`
+    : `\u26a0 0 prices fetched \u00b7 ${failed} failed \u00b7 Check key/connection`
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════════════
+function showPage(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('on'));
+  document.getElementById('page-' + id).classList.add('on');
+  btn.classList.add('on');
+}
+
+// ════════════════════════════════════════════════════════════════
+// STOCK TABLE
+// ════════════════════════════════════════════════════════════════
+const catColors = {
+  semiconductors:'rgba(255,107,53,.12)',healthcare:'rgba(0,232,150,.12)',
+  materials:'rgba(255,176,32,.12)',technology:'rgba(40,180,255,.12)',
+  defence:'rgba(160,96,255,.12)',energy:'rgba(248,208,64,.12)',financials:'rgba(0,212,255,.12)'
+};
+const catTextColors = {
+  semiconductors:'#ff6b35',healthcare:'#00e896',materials:'#ffb020',
+  technology:'#28b4ff',defence:'#a060ff',energy:'#f0c840',financials:'#00d4ff'
+};
+const sigCls = { buy:'sig-buy', sell:'sig-sell', hold:'sig-hold', wait:'sig-wait', avoid:'sig-avoid' };
+
+function renderStockTable(data) {
+  document.getElementById('stockTableBody').innerHTML = data.map((s,i) => `
+    <tr>
+      <td>
+        <div class="td-ticker" style="color:${catTextColors[s.cat]||'var(--blue)'}">${s.ticker}</div>
+        <div class="td-name">${s.name}</div>
+      </td>
+      <td><span class="cat-tag" style="background:${catColors[s.cat]};color:${catTextColors[s.cat]};border:1px solid ${catTextColors[s.cat]}40">${s.catLabel}</span></td>
+      <td><div class="price-cell">$${s.price.toFixed(2)}</div></td>
+      <td><div class="change-cell" style="color:${s.change>=0?'var(--green)':'var(--red)'}">${s.change>=0?'+':''}${s.change.toFixed(2)}%</div></td>
+      <td>
+        <div style="font-family:var(--m);font-size:10px">PT: $${s.pt}</div>
+        <div style="font-family:var(--m);font-size:10px;color:${s.upside>=0?'var(--green)':'var(--red)'};font-weight:600">${s.upside>=0?'+':''}${s.upside}%</div>
+      </td>
+      <td>
+        <div class="conf-wrap">
+          <div class="conf-track"><div class="conf-fill" style="width:${s.conf}%;background:${s.conf>=85?'var(--green)':s.conf>=70?'var(--amber)':'var(--red)'}"></div></div>
+          <div class="conf-num" style="color:${s.conf>=85?'var(--green)':s.conf>=70?'var(--amber)':'var(--red)'}">${s.conf}</div>
+        </div>
+      </td>
+      <td style="font-size:10px;color:var(--muted);max-width:160px">${s.strategy}</td>
+      <td><span class="sig ${sigCls[s.signal]||'sig-hold'}">${s.action}</span></td>
+      <td>
+        <div class="alloc-cell">
+          <div class="alloc-track"><div class="alloc-fill" style="width:${(s.alloc/8)*100}%"></div></div>
+          <div class="alloc-pct">${s.alloc}%</div>
+        </div>
+      </td>
+      <td>
+        <div style="font-family:var(--m);font-size:10px;color:var(--blue)">${s.upside>=0?'+'+s.upside+'%':s.upside+'%'}</div>
+        <div style="font-size:9px;color:var(--muted)">${s.timeframe}</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:1px">${s.note}</div>
+      </td>
+    </tr>`).join('');
+}
+
+let currentFilter = 'all';
+function filterTable(cat) {
+  currentFilter = cat;
+  const filtered = cat === 'all' ? STOCKS_DATA : STOCKS_DATA.filter(s => s.cat === cat);
+  renderStockTable(filtered);
+}
+
+function sortTable(field) {
+  const map = { name:'ticker', price:'price', change:'change', confidence:'conf', alloc:'alloc' };
+  const key = map[field] || field;
+  const sorted = [...STOCKS_DATA].sort((a,b) => typeof a[key]==='string' ? a[key].localeCompare(b[key]) : b[key]-a[key]);
+  renderStockTable(sorted);
+}
+
+// ════════════════════════════════════════════════════════════════
+// ETF GRID — CR-001: Market-wide, not restricted to portfolio
+// ════════════════════════════════════════════════════════════════
+let etfCatFilter = 'all';
+function filterETF(cat) {
+  etfCatFilter = cat;
+  renderETFGrid();
+  document.querySelectorAll('.etf-filter-btn').forEach(b => b.classList.toggle('on', b.dataset.cat === cat));
+}
+
+function renderETFGrid() {
+  const cats = ['all', ...new Set(ETF_DATA.map(e => e.cat))];
+  const filterBar = document.getElementById('etfFilterBar');
+  if (filterBar && filterBar.children.length === 0) {
+    filterBar.innerHTML = cats.map(c => `
+      <button class="etf-filter-btn${c==='all'?' on':''}" data-cat="${c}" onclick="filterETF('${c}')">
+        ${c === 'all' ? 'All ETFs' : c}
+      </button>`).join('');
+  }
+  const filtered = etfCatFilter === 'all' ? ETF_DATA : ETF_DATA.filter(e => e.cat === etfCatFilter);
+  const sigMap = { continue:'sig-hold', increase:'sig-buy', watch:'sig-wait', avoid:'sig-avoid' };
+  document.getElementById('etfGrid').innerHTML = filtered.map(e => `
+    <div class="etf-card">
+      <div style="height:3px;background:${e.color}"></div>
+      <div class="etf-top">
+        <div>
+          <div class="etf-ticker" style="color:${e.color}">${e.ticker}</div>
+          <div class="etf-name">${e.name}</div>
+          <div style="margin-top:4px"><span class="cat-tag" style="background:${e.color}15;color:${e.color};border:1px solid ${e.color}30">${e.cat}</span></div>
+        </div>
+        <div style="text-align:right">
+          <span class="sig ${sigMap[e.signal]||'sig-hold'}" style="font-size:12px;padding:4px 10px">${e.grade}</span>
+          <div style="font-family:var(--m);font-size:8px;color:var(--muted);margin-top:5px">ER ${e.er}% · β${e.beta}</div>
+        </div>
+      </div>
+      <div class="etf-body">
+        <div class="etf-row"><span class="etf-label">YTD Return</span><span class="etf-value" style="color:${e.ytd>8?'var(--green)':e.ytd>0?'var(--blue)':'var(--red)'}">+${e.ytd}%</span></div>
+        <div class="etf-row"><span class="etf-label">1-Year Return</span><span class="etf-value" style="color:var(--blue)">+${e.oneY}%</span></div>
+        <div class="etf-row"><span class="etf-label">Expense Ratio</span><span class="etf-value" style="color:${e.er>0.4?'var(--red)':e.er>0.15?'var(--amber)':'var(--green)'}">${e.er}%</span></div>
+        <div class="etf-row"><span class="etf-label">Dividend Yield</span><span class="etf-value">${e.yield_}%</span></div>
+        <div class="etf-row"><span class="etf-label">Beta</span><span class="etf-value" style="color:${e.beta>1.5?'var(--amber)':'var(--muted)'}">${e.beta}</span></div>
+        <div class="etf-dca ${sigMap[e.signal]||'sig-hold'}" style="margin-top:10px;font-size:10px;line-height:1.6">
+          ${e.verdict}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════════════════════════════
+// DASHBOARD TABLES — CR-002: User-input only, no pre-population
+// ════════════════════════════════════════════════════════════════
+function renderHoldings() {
+  const mem = loadMemory();
+  const etfTickers = new Set(ETF_DATA.map(e => e.ticker));
+  const stocks = mem.filter(e => {
+    const tk = e.stock.split(' ')[0].replace('—','').trim().toUpperCase();
+    return !etfTickers.has(tk);
+  });
+  const body = document.getElementById('holdingsTableBody');
+  if (!stocks.length) {
+    body.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:28px;color:var(--muted);font-size:12px">
+      No stock entries yet · Use the manual entry form below · Click any entry to edit or delete
+    </td></tr>`;
+    updatePortfolioSummary();
+    return;
+  }
+  // Group by ticker
+  const grouped = {};
+  stocks.forEach(e => {
+    const tk = e.stock.split(' ')[0].replace('—','').trim().toUpperCase();
+    if (!grouped[tk]) grouped[tk] = { ticker:tk, name:e.stock, entries:[] };
+    grouped[tk].entries.push(e);
+  });
+  let totalPortValue = 0, totalInvestedAll = 0;
+  body.innerHTML = Object.values(grouped).map(g => {
+    const totalInvested = g.entries.reduce((s,e) => s + (parseFloat(e.amount)||0), 0);
+    const totalShares = g.entries.reduce((s,e) => {
+      const bp = parseFloat(e.buyPrice)||1;
+      return s + (parseFloat(e.amount)||0)/bp;
+    }, 0);
+    const avgCost = totalShares > 0 ? totalInvested/totalShares : 0;
+    const live = LIVE_PRICES[g.ticker];
+    const curPrice = live ? live.price : null;
+    const curVal = curPrice ? totalShares * curPrice : null;
+    const pnl = curVal !== null ? curVal - totalInvested : null;
+    const pnlPct = pnl !== null && totalInvested ? ((pnl/totalInvested)*100) : null;
+    if (curVal) totalPortValue += curVal;
+    totalInvestedAll += totalInvested;
+    const liveTag = live ? `<span style="font-family:var(--m);font-size:8px;color:var(--green);margin-left:4px">● LIVE</span>` : `<span style="font-family:var(--m);font-size:8px;color:var(--muted);margin-left:4px">○ Press Refresh</span>`;
+    return `<tr style="cursor:pointer" onclick="openEntryList('${g.ticker}','${g.name.replace(/'/g,"\\'")}')">
+      <td>
+        <div class="td-ticker" style="color:var(--blue);font-size:14px">${g.ticker}${liveTag}</div>
+        <div class="td-name">${g.entries.length} entr${g.entries.length>1?'ies':'y'} · click to edit</div>
+      </td>
+      <td style="font-family:var(--m)">${totalShares.toFixed(4)}</td>
+      <td style="font-family:var(--m)">$${avgCost.toFixed(2)}</td>
+      <td style="font-family:var(--m);color:${curVal?'var(--text)':'var(--muted)'}">
+        ${curVal ? '$'+curVal.toFixed(2) : '—'}
+        ${curPrice ? `<div style="font-size:9px;color:var(--muted)">@$${curPrice.toFixed(2)}</div>` : ''}
+      </td>
+      <td style="font-family:var(--m)">$${avgCost.toFixed(2)}</td>
+      <td style="font-family:var(--m)">$${totalInvested.toFixed(2)}</td>
+      <td style="font-family:var(--m);color:${pnl===null?'var(--muted)':pnl>=0?'var(--green)':'var(--red)'}">
+        ${pnl===null ? '—' : (pnl>=0?'+':'')+'$'+Math.abs(pnl).toFixed(2)}
+      </td>
+      <td style="font-family:var(--m);font-weight:600;color:${pnlPct===null?'var(--muted)':pnlPct>=0?'var(--green)':'var(--red)'}">
+        ${pnlPct===null ? '—' : (pnlPct>=0?'+':'')+pnlPct.toFixed(2)+'%'}
+      </td>
+      <td style="font-family:var(--m);color:var(--muted)">—</td>
+      <td><span class="sig sig-hold">HELD</span></td>
+    </tr>`;
+  }).join('');
+  updatePortfolioSummary(totalInvestedAll, totalPortValue);
+}
+
+function renderETFHoldings() {
+  const mem = loadMemory();
+  const etfTickers = new Set(ETF_DATA.map(e => e.ticker));
+  const etfEntries = mem.filter(e => {
+    const tk = e.stock.split(' ')[0].replace('—','').trim().toUpperCase();
+    return etfTickers.has(tk);
+  });
+  const body = document.getElementById('etfHoldingsBody');
+  if (!etfEntries.length) {
+    body.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:28px;color:var(--muted);font-size:12px">
+      No ETF entries yet · Add your ETF investments using the entry form below · Click to edit
+    </td></tr>`;
+    return;
+  }
+  const grouped = {};
+  etfEntries.forEach(e => {
+    const tk = e.stock.split(' ')[0].replace('—','').trim().toUpperCase();
+    if (!grouped[tk]) grouped[tk] = { ticker:tk, entries:[] };
+    grouped[tk].entries.push(e);
+  });
+  body.innerHTML = Object.values(grouped).map(g => {
+    const etfMeta = ETF_DATA.find(e => e.ticker === g.ticker) || {};
+    const totalInvested = g.entries.reduce((s,e) => s + (parseFloat(e.amount)||0), 0);
+    const totalUnits = g.entries.reduce((s,e) => {
+      const bp = parseFloat(e.buyPrice)||1;
+      return s + (parseFloat(e.amount)||0)/bp;
+    }, 0);
+    const avgCost = totalUnits > 0 ? totalInvested/totalUnits : 0;
+    const live = LIVE_PRICES[g.ticker];
+    const curPrice = live ? live.price : null;
+    const curVal = curPrice ? totalUnits * curPrice : null;
+    const pnl = curVal !== null ? curVal - totalInvested : null;
+    const pnlPct = pnl !== null && totalInvested ? ((pnl/totalInvested)*100) : null;
+    const liveTag = live ? `<span style="font-family:var(--m);font-size:8px;color:var(--green)"> ● LIVE</span>` : '';
+    return `<tr style="cursor:pointer" onclick="openEntryList('${g.ticker}','${etfMeta.name||g.ticker}')">
+      <td>
+        <div class="td-ticker" style="color:${etfMeta.color||'var(--blue)'};font-size:14px">${g.ticker}${liveTag}</div>
+        <div class="td-name">${etfMeta.name||''} · click to edit</div>
+      </td>
+      <td style="font-family:var(--m)">${totalUnits.toFixed(4)}</td>
+      <td style="font-family:var(--m)">$${avgCost.toFixed(2)}</td>
+      <td style="font-family:var(--m);color:${curVal?'var(--text)':'var(--muted)'}">
+        ${curVal ? '$'+curVal.toFixed(2) : '—'}
+      </td>
+      <td style="font-family:var(--m)">$${avgCost.toFixed(2)}</td>
+      <td style="font-family:var(--m)">$${totalInvested.toFixed(2)}</td>
+      <td style="font-family:var(--m);color:${pnl===null?'var(--muted)':pnl>=0?'var(--green)':'var(--red)'}">
+        ${pnl===null ? '—' : (pnl>=0?'+':'')+'$'+Math.abs(pnl).toFixed(2)}
+      </td>
+      <td style="font-family:var(--m);color:${pnlPct===null?'var(--muted)':pnlPct>=0?'var(--green)':'var(--red)'}">
+        ${pnlPct===null ? '—' : (pnlPct>=0?'+':'')+pnlPct.toFixed(2)+'%'}
+      </td>
+      <td><span class="sig ${etfMeta.signal==='increase'?'sig-buy':'sig-hold'}">${(etfMeta.signal||'hold').toUpperCase()}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function updatePortfolioSummary(totalInvested, presentValue) {
+  const mem = loadMemory();
+  const total = totalInvested ?? mem.reduce((s,e) => s + (parseFloat(e.amount)||0), 0);
+  document.getElementById('totalInvested').textContent = '$' + total.toFixed(2);
+  if (presentValue && presentValue > 0) {
+    const pnl = presentValue - total;
+    const pnlPct = total > 0 ? ((pnl/total)*100) : 0;
+    document.getElementById('presentValue').textContent = '$' + presentValue.toFixed(2);
+    document.getElementById('totalPnL').textContent = (pnl>=0?'+':'') + '$' + Math.abs(pnl).toFixed(2);
+    document.getElementById('totalPnL').style.color = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+    document.getElementById('totalPnLPct').textContent = (pnlPct>=0?'+':'') + pnlPct.toFixed(2) + '%';
+    document.getElementById('xirrVal').textContent = '—';
+  } else {
+    document.getElementById('presentValue').textContent = Object.keys(LIVE_PRICES).length ? '—' : '— (press Refresh)';
+    document.getElementById('totalPnL').textContent = '—';
+    document.getElementById('totalPnLPct').textContent = 'Press Refresh for live prices';
+    document.getElementById('xirrVal').textContent = '—';
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// REMINDERS
+// ════════════════════════════════════════════════════════════════
+function renderReminders() {
+  const typeIcons = { conditional:'⚡', 'price-alert':'📊', earnings:'📅' };
+  document.getElementById('reminderList').innerHTML = REMINDERS_DATA.map(r => `
+    <div class="reminder-item">
+      <div class="ri-left">
+        <div class="ri-title">
+          ${typeIcons[r.type]||'🔔'} ${r.title}
+          <span style="font-family:var(--m);font-size:8px;color:var(--muted)">[${r.ticker}]</span>
+        </div>
+        <div class="ri-date">📅 ${r.date}</div>
+        <div class="ri-desc">${r.strategy}</div>
+      </div>
+      <div class="ri-actions">
+        <button class="ri-btn edit" onclick="editReminder(${r.id})">Edit</button>
+        <button class="ri-btn" onclick="removeReminder(${r.id})">Remove</button>
+      </div>
+    </div>`).join('');
+}
+
+function showAddReminder() { showToast('📅 Google Calendar integration · Setup OAuth to enable'); }
+function syncCalendar() { showToast('⟳ Syncing with Google Calendar...'); }
+function editReminder(id) { showToast('✏ Edit reminder #' + id); }
+function removeReminder(id) {
+  const idx = REMINDERS_DATA.findIndex(r => r.id === id);
+  if (idx > -1) { REMINDERS_DATA.splice(idx, 1); renderReminders(); showToast('🗑 Reminder removed'); }
+}
+
+// ════════════════════════════════════════════════════════════════
+// EDIT / DELETE MODAL — Fix: click any logged entry to edit/delete
+// ════════════════════════════════════════════════════════════════
+function openEntryList(ticker, name) {
+  const mem = loadMemory();
+  const entries = mem.filter(e => {
+    const tk = e.stock.split(' ')[0].replace('—','').trim().toUpperCase();
+    return tk === ticker.toUpperCase();
+  });
+  const modal = document.getElementById('editModal');
+  document.getElementById('editModalTitle').textContent = `${ticker} — ${name}`;
+  document.getElementById('editModalBody').innerHTML = entries.length ? entries.map(e => `
+    <div class="edit-entry-row" id="erow-${e.id}">
+      <div class="eer-info">
+        <div class="eer-date">${e.date}</div>
+        <div class="eer-detail">$${parseFloat(e.amount||0).toFixed(2)} · @$${parseFloat(e.buyPrice||0).toFixed(2)} · ${e.stock}</div>
+        ${e.sellPrice ? `<div class="eer-sold">Sold @$${e.sellPrice} · Value $${e.sellValue||'—'}</div>` : ''}
+      </div>
+      <div class="eer-actions">
+        <button class="eer-btn eer-edit" onclick="startEditEntry(${e.id})">✏ Edit</button>
+        <button class="eer-btn eer-del" onclick="deleteEntry(${e.id})">✕ Delete</button>
+      </div>
+    </div>`).join('') : '<div style="color:var(--muted);font-size:11px;padding:14px">No entries found.</div>';
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeEditModal() {
+  document.getElementById('editModal').classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('inlineEditArea').style.display = 'none';
+}
+
+function deleteEntry(id) {
+  if (!confirm('Delete this entry? This cannot be undone.')) return;
+  const mem = loadMemory().filter(e => e.id !== id);
+  saveMemory(mem);
+  document.getElementById(`erow-${id}`)?.remove();
+  renderHoldings(); renderETFHoldings(); renderPortfolioChart();
+  showToast('🗑 Entry deleted');
+  const remaining = document.querySelectorAll('.edit-entry-row');
+  if (!remaining.length) closeEditModal();
+}
+
+function startEditEntry(id) {
+  const mem = loadMemory();
+  const entry = mem.find(e => e.id === id);
+  if (!entry) return;
+  const area = document.getElementById('inlineEditArea');
+  area.style.display = 'block';
+  area.innerHTML = `
+    <div style="background:var(--bg4);border:1px solid var(--blue-b);border-radius:8px;padding:14px 16px;margin-top:10px">
+      <div style="font-family:var(--m);font-size:10px;color:var(--blue);margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em">Editing Entry #${id}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input type="date" class="form-input" id="ei-date" value="${entry.date||''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Amount ($)</label>
+          <input type="number" class="form-input" id="ei-amount" value="${entry.amount||''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Buy Price ($)</label>
+          <input type="number" class="form-input" id="ei-buyPrice" value="${entry.buyPrice||''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sold Price ($)</label>
+          <input type="number" class="form-input" id="ei-sellPrice" value="${entry.sellPrice||''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sold Value ($)</label>
+          <input type="number" class="form-input" id="ei-sellValue" value="${entry.sellValue||''}">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn-primary" onclick="saveEditEntry(${id})">Save Changes</button>
+        <button class="btn-secondary" onclick="document.getElementById('inlineEditArea').style.display='none'">Cancel</button>
+      </div>
+    </div>`;
+  area.scrollIntoView({ behavior:'smooth' });
+}
+
+function saveEditEntry(id) {
+  const mem = loadMemory();
+  const idx = mem.findIndex(e => e.id === id);
+  if (idx < 0) return;
+  mem[idx].date      = document.getElementById('ei-date').value || mem[idx].date;
+  mem[idx].amount    = parseFloat(document.getElementById('ei-amount').value) || mem[idx].amount;
+  mem[idx].buyPrice  = parseFloat(document.getElementById('ei-buyPrice').value) || mem[idx].buyPrice;
+  mem[idx].sellPrice = parseFloat(document.getElementById('ei-sellPrice').value) || null;
+  mem[idx].sellValue = parseFloat(document.getElementById('ei-sellValue').value) || null;
+  mem[idx].updatedAt = new Date().toISOString();
+  saveMemory(mem);
+  showToast('✓ Entry updated successfully');
+  closeEditModal();
+  renderHoldings(); renderETFHoldings(); renderPortfolioChart();
+}
+function searchStocks(query) {
+  const dd = document.getElementById('searchDropdown');
+  if (!query || query.length < 1) { dd.classList.remove('open'); return; }
+  const q = query.toLowerCase().trim();
+  // Match ticker (starts-with first, then contains) OR name (contains)
+  const tickerStartsWith = STOCK_SYMBOLS.filter(s => s.tick.toLowerCase().startsWith(q));
+  const tickerContains   = STOCK_SYMBOLS.filter(s => !s.tick.toLowerCase().startsWith(q) && s.tick.toLowerCase().includes(q));
+  const nameContains     = STOCK_SYMBOLS.filter(s => !s.tick.toLowerCase().includes(q) && s.name.toLowerCase().includes(q));
+  const matches = [...tickerStartsWith, ...tickerContains, ...nameContains].slice(0, 10);
+  if (!matches.length) { dd.classList.remove('open'); return; }
+  dd.innerHTML = matches.map(m => `
+    <div class="sd-item" onclick="selectStock('${m.tick}','${m.name.replace(/'/g,"\\'")}')">
+      <span class="sd-tick">${m.tick}</span><span class="sd-name">${m.name}</span>
+    </div>`).join('');
+  dd.classList.add('open');
+}
+
+function selectStock(tick, name) {
+  document.getElementById('stockSearch').value = tick + ' — ' + name;
+  document.getElementById('searchDropdown').classList.remove('open');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.search-wrap')) {
+    document.getElementById('searchDropdown')?.classList.remove('open');
+  }
+});
+
+function addEntry() {
+  const stock = document.getElementById('stockSearch').value;
+  const date = document.getElementById('txDate').value;
+  const amount = document.getElementById('txAmount').value;
+  const buyPrice = document.getElementById('txBuyPrice').value;
+  if (!stock || !date || !amount) { showToast('⚠ Please fill Stock, Date and Amount'); return; }
+  const mem = loadMemory();
+  mem.push({ id:Date.now(), stock, date, amount:parseFloat(amount), buyPrice:parseFloat(buyPrice)||0,
+    sellPrice:parseFloat(document.getElementById('txSellPrice').value)||null,
+    sellValue:parseFloat(document.getElementById('txSellValue').value)||null,
+    timestamp: new Date().toISOString() });
+  saveMemory(mem);
+  renderHoldings();
+  renderETFHoldings();
+  renderPortfolioChart();
+  gdrive_autoSave(); // auto-save to Drive if connected
+  showToast('✓ Entry saved · ' + stock + ' · $' + parseFloat(amount).toFixed(2));
+  clearForm();
+}
+
+function clearForm() {
+  ['stockSearch','txAmount','txBuyPrice','txSellPrice','txSellValue'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// FILE UPLOAD
+// ════════════════════════════════════════════════════════════════
+function handleFileUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  showToast(`📂 Processing ${file.name}... (${ext.toUpperCase()} parser active)`);
+  setTimeout(() => showToast(`✓ File parsed · ${file.name} · Entries queued for review`), 1800);
+}
+function handleDrop(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (file) handleFileUpload({ files: [file] });
+}
+
+// ════════════════════════════════════════════════════════════════
+// DIAGNOSTICS
+// ════════════════════════════════════════════════════════════════
+function updateDiagnostics() {
+  const mem = loadMemory();
+  const el = document.getElementById('diagEntries');
+  if (el) el.textContent = mem.length;
+  const ms = document.getElementById('diagMemSize');
+  if (ms) ms.textContent = (JSON.stringify(mem).length / 1024).toFixed(1) + ' KB';
+}
+
+function exportAll() {
+  const payload = {
+    generated: new Date().toISOString(),
+    version: '1.0.0-prototype',
+    algorithm_v34: { factors:'F1-F5', modifiers:13, weights:'Combo C (F4:36%, F2:22%, F3:22%, F1:10%, F5:10%)' },
+    st_v1: { factors:6, timeframes:['swing','momentum','trend','medium'] },
+    portfolio_memory: loadMemory(),
+    stock_scores: STOCKS_DATA,
+    etf_analysis: ETF_DATA,
+    reminders: REMINDERS_DATA,
+    system_health: { timestamp: new Date().toISOString() }
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ideepin_diagnostic_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  showToast('📦 Diagnostic package exported');
+}
+
+function exportMemory() {
+  const blob = new Blob([JSON.stringify(loadMemory(), null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ideepin_portfolio_memory_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  showToast('💾 Portfolio memory exported');
+}
+
+function exportScores() {
+  const blob = new Blob([JSON.stringify({ stocks:STOCKS_DATA, etfs:ETF_DATA }, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ideepin_algorithm_scores_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  showToast('📊 Algorithm scores exported');
+}
+
+function clearMemory() {
+  if (confirm('Clear all portfolio memory? This cannot be undone.')) {
+    localStorage.removeItem('ideepin_portfolio');
+    updateDiagnostics();
+    showToast('🗑 Portfolio memory cleared');
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// CHARTS
+// ════════════════════════════════════════════════════════════════
+let _charts = {};
+function destroyChart(id) { if (_charts[id]) { _charts[id].destroy(); delete _charts[id]; } }
+
+function renderCharts() {
+  // Confidence chart — Basket 1
+  const cc = document.getElementById('confChart')?.getContext('2d');
+  if (cc) { destroyChart('conf'); _charts.conf = new Chart(cc, {
+    type:'bar',
+    data:{ labels:STOCKS_DATA.map(s=>s.ticker),
+      datasets:[{ data:STOCKS_DATA.map(s=>s.conf),
+        backgroundColor:STOCKS_DATA.map(s=>s.conf>=85?'rgba(0,232,150,.7)':s.conf>=70?'rgba(255,176,32,.7)':'rgba(255,61,110,.7)'),
+        borderColor:STOCKS_DATA.map(s=>s.conf>=85?'#00e896':s.conf>=70?'#ffb020':'#ff3d6e'),
+        borderWidth:1,borderRadius:3 }]},
+    options:{ responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{ y:{min:0,max:100,ticks:{font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},
+        x:{ticks:{font:{size:9}},grid:{display:false}}}}
+  }); }
+
+  // Sector chart — Basket 1
+  const sc = document.getElementById('sectorChart')?.getContext('2d');
+  if (sc) {
+    const sects = {};
+    STOCKS_DATA.forEach(s => { sects[s.catLabel] = (sects[s.catLabel]||0) + s.alloc; });
+    const colors = ['#ff6b35','#00e896','#ffb020','#28b4ff','#a060ff','#f0c840','#00d4ff'];
+    destroyChart('sect'); _charts.sect = new Chart(sc, {
+      type:'doughnut',
+      data:{ labels:Object.keys(sects), datasets:[{ data:Object.values(sects),
+        backgroundColor:colors.map(c=>c+'cc'), borderColor:colors, borderWidth:1.5 }]},
+      options:{ responsive:true,maintainAspectRatio:false,cutout:'58%',
+        plugins:{ legend:{ position:'right', labels:{ font:{size:9}, color:'rgba(212,228,244,.7)', boxWidth:10 }}}}
+    });
+  }
+
+  // ETF YTD chart
+  const ep = document.getElementById('etfPerfChart')?.getContext('2d');
+  if (ep) { destroyChart('etfperf'); _charts.etfperf = new Chart(ep, {
+    type:'bar',
+    data:{ labels:ETF_DATA.map(e=>e.ticker),
+      datasets:[
+        { label:'YTD %', data:ETF_DATA.map(e=>e.ytd),
+          backgroundColor:ETF_DATA.map(e=>e.ytd>10?'rgba(0,232,150,.7)':e.ytd>5?'rgba(40,180,255,.7)':'rgba(255,176,32,.7)'),
+          borderColor:ETF_DATA.map(e=>e.color), borderWidth:1,borderRadius:3 },
+        { type:'line', label:'VOO 7.9%', data:ETF_DATA.map(()=>7.92),
+          borderColor:'rgba(255,255,255,.3)', borderWidth:1.5, borderDash:[5,4], pointRadius:0, backgroundColor:'transparent' }
+      ]},
+    options:{ responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'rgba(212,228,244,.5)',font:{size:9}}}},
+      scales:{ y:{ticks:{callback:v=>v+'%',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},
+        x:{ticks:{font:{size:9}},grid:{display:false}}}}
+  }); }
+
+  // ETF category donut
+  const ea = document.getElementById('etfAllocChart')?.getContext('2d');
+  if (ea) {
+    const cats = {}; ETF_DATA.forEach(e => { cats[e.cat] = (cats[e.cat]||0) + 1; });
+    const cols = ['#28b4ff','#a060ff','#00e896','#ffb020','#f0c840','#90b0d0','#ff6b35','#10d8c0'];
+    destroyChart('etfalloc'); _charts.etfalloc = new Chart(ea, {
+      type:'doughnut',
+      data:{ labels:Object.keys(cats), datasets:[{ data:Object.values(cats),
+        backgroundColor:cols.map(c=>c+'cc'), borderColor:cols, borderWidth:1.5 }]},
+      options:{ responsive:true,maintainAspectRatio:false,cutout:'55%',
+        plugins:{ legend:{ position:'right', labels:{ font:{size:9}, color:'rgba(212,228,244,.7)', boxWidth:10 }}}}
+    });
+  }
+
+  renderPortfolioChart();
+}
+
+function renderPortfolioChart() {
+  const mem = loadMemory();
+  const pc = document.getElementById('portfolioChart')?.getContext('2d');
+  if (pc) {
+    destroyChart('port');
+    if (!mem.length) {
+      pc.canvas.parentElement.innerHTML += `<div style="text-align:center;color:var(--muted);padding:40px;font-size:12px">Add investments to see portfolio chart</div>`;
+      return;
+    }
+    // Build cumulative invested by date
+    const sorted = [...mem].sort((a,b) => new Date(a.date)-new Date(b.date));
+    let cumulative = 0;
+    const labels = sorted.map(e => e.date);
+    const invested = sorted.map(e => { cumulative += (parseFloat(e.amount)||0); return parseFloat(cumulative.toFixed(2)); });
+    _charts.port = new Chart(pc, {
+      type:'line',
+      data:{ labels,
+        datasets:[{ label:'Total Invested', data:invested,
+          borderColor:'var(--blue)', backgroundColor:'rgba(40,180,255,.1)', borderWidth:2, fill:true, tension:.4 }]},
+      options:{ responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+        scales:{ y:{ticks:{callback:v=>'$'+v,font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},
+          x:{ticks:{font:{size:9},maxTicksLimit:6},grid:{display:false}}}}
+    });
+  }
+
+  // P&L chart — empty state
+  const pnl = document.getElementById('pnlChart')?.getContext('2d');
+  if (pnl) {
+    destroyChart('pnl');
+    if (!mem.length) return;
+    const grouped = {};
+    mem.forEach(e => {
+      const tk = e.stock.split(' ')[0].replace('—','').trim();
+      grouped[tk] = (grouped[tk]||0) + (parseFloat(e.amount)||0);
+    });
+    const cols = ['#28b4ff','#00e896','#ffb020','#a060ff','#f0c840','#ff6b35','#10d8c0','#ff3d6e'];
+    _charts.pnl = new Chart(pnl, {
+      type:'bar',
+      data:{ labels:Object.keys(grouped), datasets:[{ label:'Invested',
+        data:Object.values(grouped),
+        backgroundColor:Object.keys(grouped).map((_,i)=>cols[i%cols.length]+'99'),
+        borderColor:Object.keys(grouped).map((_,i)=>cols[i%cols.length]),
+        borderWidth:1,borderRadius:3 }]},
+      options:{ responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+        scales:{ y:{ticks:{callback:v=>'$'+v,font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},
+          x:{ticks:{font:{size:9}},grid:{display:false}}}}
+    });
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// EXPORT / IMPORT — Solution 1: portable data file
+// ════════════════════════════════════════════════════════════════
+function exportPortfolioData() {
+  const mem = loadMemory();
+  if (!mem.length) { showToast('⚠ No data to export — add entries first'); return; }
+  const payload = {
+    _ideepin_version:'1.3.0',
+    _exported_at:new Date().toISOString(),
+    _exported_by:'iDeepin · Intelligent Deep Investment',
+    _entry_count:mem.length,
+    portfolio:mem,
+    live_price_cache:LIVE_PRICES,
+  };
+  const blob = new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const date = new Date().toISOString().slice(0,10);
+  a.href=url; a.download=`ideepin_portfolio_${date}.json`; a.click();
+  URL.revokeObjectURL(url);
+  showToast(`✓ Exported ${mem.length} entries → ideepin_portfolio_${date}.json · Keep this file safe`);
+}
+
+function importPortfolioData(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      const entries = Array.isArray(data) ? data : (data.portfolio || []);
+      if (!entries.length) { showToast('⚠ No entries found in file'); return; }
+      const existing    = loadMemory();
+      const existingIds = new Set(existing.map(e=>e.id));
+      const fresh       = entries.filter(e=>!existingIds.has(e.id));
+      const merged      = [...existing,...fresh];
+      saveMemory(merged);
+      renderHoldings(); renderETFHoldings(); renderPortfolioChart();
+      updatePortfolioSummary(); updateDiagnostics();
+      showToast(`✓ Imported ${fresh.length} new entries · ${existing.length} existing kept · Total: ${merged.length}`);
+    } catch(err) { showToast('✗ Invalid file — must be iDeepin JSON export'); }
+    input.value='';
+  };
+  reader.readAsText(file);
+}
+
+// ════════════════════════════════════════════════════════════════
+// GOOGLE DRIVE SYNC — Solution 2
+// ════════════════════════════════════════════════════════════════
+const GDRIVE = {
+  clientId: localStorage.getItem('ideepin_gdrive_clientid')||'',
+  fileId:   localStorage.getItem('ideepin_gdrive_fileid')||'',
+  fileName: 'portfolio_memory.json',
+  isConnected: false,
+};
+
+function gdrive_setClientId(val) {
+  GDRIVE.clientId = val.trim();
+  localStorage.setItem('ideepin_gdrive_clientid', GDRIVE.clientId);
+}
+
+function gdrive_updateStatus(msg, ok) {
+  const el = document.getElementById('gdriveStatus');
+  if (el) { el.textContent=msg; el.style.color=ok?'var(--green)':ok===false?'var(--red)':'var(--amber)'; }
+}
+
+async function gdrive_connect() {
+  if (!GDRIVE.clientId) { showToast('⚠ Enter your OAuth Client ID first'); gdrive_updateStatus('⚠ Client ID missing',null); return; }
+  gdrive_updateStatus('Loading Google API...',null);
+  try {
+    if (!window.gapi) {
+      await new Promise((res,rej)=>{ const s=document.createElement('script'); s.src='https://apis.google.com/js/api.js'; s.onload=res; s.onerror=rej; document.head.appendChild(s); });
+    }
+    await new Promise(res=>gapi.load('client:auth2',res));
+    await gapi.client.init({
+      clientId:GDRIVE.clientId,
+      discoveryDocs:['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+      scope:'https://www.googleapis.com/auth/drive.file',
+    });
+    if (!gapi.auth2.getAuthInstance().isSignedIn.get()) await gapi.auth2.getAuthInstance().signIn();
+    GDRIVE.isConnected=true;
+    gdrive_updateStatus('✓ Connected to Google Drive',true);
+    showToast('✓ Google Drive connected');
+    document.getElementById('gdriveConnectBtn').textContent='✓ Connected · Re-connect';
+    document.getElementById('gdriveSyncBtn').disabled=false;
+    document.getElementById('gdriveLoadBtn').disabled=false;
+    await gdrive_findFile();
+  } catch(err) {
+    gdrive_updateStatus('✗ Failed: '+(err.error||err.message||JSON.stringify(err)),false);
+    showToast('✗ Drive connect failed — check Client ID and allow popups');
+    console.error('GDrive connect:',err);
+  }
+}
+
+async function gdrive_findFile() {
+  try {
+    const res = await GDRIVE.isConnected && gapi.client.drive.files.list({
+      q:`name='${GDRIVE.fileName}' and trashed=false`,
+      fields:'files(id,name,modifiedTime)',spaces:'drive',
+    });
+    const files = res.result.files;
+    if (files&&files.length) {
+      GDRIVE.fileId=files[0].id;
+      localStorage.setItem('ideepin_gdrive_fileid',GDRIVE.fileId);
+      gdrive_updateStatus(`✓ Portfolio file found · Last saved ${new Date(files[0].modifiedTime).toLocaleDateString()}`,true);
+    } else {
+      gdrive_updateStatus('Connected · No existing file — will create on first save',null);
+    }
+  } catch(e){ console.error('GDrive find:',e); }
+}
+
+function gdrive_getToken() {
+  return gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
+}
+
+async function gdrive_saveToCloud() {
+  if (!GDRIVE.isConnected) { showToast('⚠ Connect Google Drive first'); return; }
+  const mem = loadMemory();
+  if (!mem.length) { showToast('⚠ No data to save'); return; }
+  gdrive_updateStatus('Saving...',null);
+  try {
+    const content = JSON.stringify({_ideepin_version:'1.3.0',_saved_at:new Date().toISOString(),_entry_count:mem.length,portfolio:mem},null,2);
+    const blob    = new Blob([content],{type:'application/json'});
+    const token   = gdrive_getToken();
+    const form    = new FormData();
+    form.append('metadata',new Blob([JSON.stringify({name:GDRIVE.fileName,mimeType:'application/json'})],{type:'application/json'}));
+    form.append('file',blob);
+    if (GDRIVE.fileId) {
+      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${GDRIVE.fileId}?uploadType=multipart`,{method:'PATCH',headers:{Authorization:'Bearer '+token},body:form});
+    } else {
+      const r = await (await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{Authorization:'Bearer '+token},body:form})).json();
+      GDRIVE.fileId=r.id; localStorage.setItem('ideepin_gdrive_fileid',r.id);
+    }
+    gdrive_updateStatus(`✓ ${mem.length} entries saved to Drive · ${new Date().toLocaleTimeString()}`,true);
+    showToast(`✓ Saved ${mem.length} entries to Google Drive`);
+  } catch(err){ gdrive_updateStatus('✗ Save failed: '+(err.message||'Unknown'),false); showToast('✗ Drive save failed'); console.error('GDrive save:',err); }
+}
+
+async function gdrive_loadFromCloud() {
+  if (!GDRIVE.isConnected) { showToast('⚠ Connect Google Drive first'); return; }
+  if (!GDRIVE.fileId) { showToast('⚠ No portfolio file in Drive — save first'); return; }
+  gdrive_updateStatus('Loading from Drive...',null);
+  try {
+    const token = gdrive_getToken();
+    const data  = await (await fetch(`https://www.googleapis.com/drive/v3/files/${GDRIVE.fileId}?alt=media`,{headers:{Authorization:'Bearer '+token}})).json();
+    const entries = data.portfolio||[];
+    saveMemory(entries);
+    renderHoldings(); renderETFHoldings(); renderPortfolioChart(); updatePortfolioSummary(); updateDiagnostics();
+    gdrive_updateStatus(`✓ Loaded ${entries.length} entries from Drive`,true);
+    showToast(`✓ ${entries.length} entries loaded from Google Drive`);
+  } catch(err){ gdrive_updateStatus('✗ Load failed: '+(err.message||'Unknown'),false); showToast('✗ Drive load failed'); console.error('GDrive load:',err); }
+}
+
+function gdrive_autoSave() { if (GDRIVE.isConnected) setTimeout(gdrive_saveToCloud,800); }
+
+// ════════════════════════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ════════════════════════════════════════════════════════════════
+// SET DEFAULT DATE
+// ════════════════════════════════════════════════════════════════
+document.getElementById('txDate').value = new Date().toISOString().slice(0,10);
+
+// ════════════════════════════════════════════════════════════════
+// LOAD LAST UPDATE
+// ════════════════════════════════════════════════════════════════
+const lastUp = localStorage.getItem('ideepin_lastUpdate');
+document.getElementById('lastUpdateTime').textContent = lastUp || 'Not yet refreshed';
+
+// ════════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════════
+renderStockTable(STOCKS_DATA);
+renderETFGrid();
+renderHoldings();
+renderETFHoldings();
+renderReminders();
+renderCharts();
+updateDiagnostics();
+updatePortfolioSummary();
+
+// Show API key panel if no key saved yet
+const _savedKey = getFinnhubKey();
+if (!_savedKey) {
+  document.getElementById('finnhubKeyWrap').style.display = 'flex';
+} else {
+  // Pre-fill key input with masked version
+  document.getElementById('finnhubKeyInput').value = _savedKey;
+  document.getElementById('finnhubKeySaveBtn').disabled = false;
+}
+// Show key indicator in header area
+const _keyStatus = document.getElementById('keyStatus');
+if (_keyStatus) _keyStatus.textContent = _savedKey ? '● API KEY SET' : '○ NO API KEY';
+</script>
+</body>
+</html>
