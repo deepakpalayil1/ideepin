@@ -1,0 +1,149 @@
+{
+  "_ideepin_version": "1.7.0",
+  "_saved_at": "2026-05-12T03:41:08.362Z",
+  "_entry_count": 14,
+  "_instructions": "Upload this file to your GitHub repo as portfolio_memory.json. iDeepin will load it automatically.",
+  "portfolio": [
+    {
+      "id": 1778552671790,
+      "stock": "CLS",
+      "date": "2026-04-28",
+      "amount": 500,
+      "buyPrice": 357.15,
+      "sellPrice": null,
+      "sellValue": null,
+      "timestamp": "2026-05-12T02:24:31.790Z"
+    },
+    {
+      "id": 1778552714222,
+      "stock": "RMBS",
+      "date": "2026-04-28",
+      "amount": 500,
+      "buyPrice": 111.05,
+      "sellPrice": null,
+      "sellValue": null,
+      "timestamp": "2026-05-12T02:25:14.222Z"
+    },
+    {
+      "id": 1778553000571,
+      "stock": "NVDA — NVIDIA Corporation",
+      "date": "2026-04-30",
+      "amount": 402.84,
+      "buyPrice": 201.42,
+      "sellPrice": null,
+      "sellValue": null,
+      "timestamp": "2026-05-12T02:30:00.571Z"
+    },
+    {
+      "id": 1778553051797,
+      "stock": "MSFT — Microsoft Corporation",
+      "date": "2026-04-30",
+      "amount": 801.54,
+      "buyPrice": 400.77,
+      "sellPrice": null,
+      "sellValue": null,
+      "timestamp": "2026-05-12T02:30:51.797Z"
+    },
+    {
+      "id": 1778553097368,
+      "stock": "FLNC — Fluence Energy Inc",
+      "date": "2026-05-11",
+      "amount": 90,
+      "buyPrice": 25.88,
+      "sellPrice": null,
+      "sellValue": null,
+      "timestamp": "2026-05-12T02:31:37.368Z"
+    },
+    {
+      "id": 1778553277959,
+      "stock": "AMD — Advanced Micro Devices Inc",
+      "date": "2026-05-11",
+      "amount": 75,
+      "buyPrice": 456.45,
+      "sellPrice": null,
+      "sellValue": null,
+      "timestamp": "2026-05-12T02:34:37.959Z"
+    },
+    {
+      "id": 1778553350667,
+      "stock": "COHR — Coherent Corp",
+      "date": "2026-05-11",
+      "amount": 65,
+      "buyPrice": 379.08,
+      "sellPrice": null,
+      "sellValue": null,
+      "timestamp": "2026-05-12T02:35:50.667Z"
+    },
+    {
+      "id": 1778553395752,
+      "stock": "FCX — Freeport-McMoRan Inc",
+      "date": "2026-05-11",
+      "amount": 85,
+      "buyPrice": 63.7,
+      "sellPrice": null,
+      "sellValue": null,
+      "timestamp": "2026-05-12T02:36:35.752Z",
+      "updatedAt": "2026-05-12T02:37:47.461Z"
+    },
+    {
+      "id": 1778553427901,
+      "stock": "RKLB — Rocket Lab USA Inc",
+      "date": "2026-05-11",
+      "amount": 50,
+      "buyPrice": 117.74,
+      "sellPrice": null,
+      "sellValue": null,
+      "timestamp": "2026-05-12T02:37:07.901Z"
+    },
+    {
+      "id": 1778553639520,
+      "stock": "NVO — Novo Nordisk AS ADR",
+      "date": "2026-05-11",
+      "amount": 100,
+      "buyPrice": 47.3,
+      "sellPrice": null,
+      "sellValue": null,
+      "timestamp": "2026-05-12T02:40:39.521Z"
+    },
+    {
+      "id": 1778553689383,
+      "stock": "EU",
+      "date": "2026-04-22",
+      "amount": 10,
+      "buyPrice": 2,
+      "sellPrice": null,
+      "sellValue": null,
+      "timestamp": "2026-05-12T02:41:29.383Z"
+    },
+    {
+      "id": 1778553728645,
+      "stock": "UBER — Uber Technologies Inc",
+      "date": "2025-12-02",
+      "amount": 87.75,
+      "buyPrice": 87.75,
+      "sellPrice": null,
+      "sellValue": null,
+      "timestamp": "2026-05-12T02:42:08.645Z"
+    },
+    {
+      "id": 1778553806249,
+      "stock": "MSFT — Microsoft Corporation",
+      "date": "2026-05-11",
+      "amount": 2395.61,
+      "buyPrice": 446.01,
+      "sellPrice": null,
+      "sellValue": null,
+      "timestamp": "2026-05-12T02:43:26.249Z"
+    },
+    {
+      "id": 1778553916505,
+      "stock": "SOXX — iShares Semiconductor ETF",
+      "date": "2026-04-28",
+      "amount": 250,
+      "buyPrice": 438.8,
+      "sellPrice": null,
+      "sellValue": null,
+      "timestamp": "2026-05-12T02:45:16.505Z"
+    }
+  ]
+}
